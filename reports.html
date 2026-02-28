@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم الحضور</title>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    direction: rtl;
+    margin: 15px;
+    background:#f4f6f9;
+}
+
+h1{
+    text-align:center;
+    font-size:20px;
+}
+
+.dashboard{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom:20px;
+}
+
+.filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+select, button{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    font-size:14px;
+    width:100%;
+}
+
+button{
+    background:#2c3e50;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1a252f;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+.ranking-table{
+    width:100%;
+    margin-top:15px;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+.ranking-table th{
+    background:#2c3e50;
+    color:white;
+    padding:8px;
+}
+
+.ranking-table td{
+    padding:8px;
+    border-bottom:1px solid #eee;
+    text-align:center;
+}
+
+#studentsSection{
+    display:none;
+    margin-top:15px;
+}
+
+@media(min-width:768px){
+    .filters select,
+    .filters button{
+        width:auto;
+    }
+}
+</style>
+</head>
+<body>
+
+<h1>📊 لوحة تحكم الحضور</h1>
+
+<div class="dashboard">
+
+    <div class="filters">
+        <select id="fromMonth"></select>
+        <select id="toMonth"></select>
+
+        <select id="programFilter">
+            <option value="">كل البرامج</option>
+        </select>
+
+        <button onclick="calculate()">تحديث</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th>الترتيب</th>
+                    <th>الاسم</th>
+                    <th>ID</th>
+                    <th>عدد الأيام</th>
+                </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<button onclick="toggleTable()">إظهار / إخفاء جدول البيانات</button>
+
+<div id="studentsSection" class="table-wrapper">
+    <table id="studentsTable" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>ID</th>
+                <th>الاسم</th>
+                <th>اليوم</th>
+                <th>الشهر</th>
+                <th>البرنامج</th>
+                <th>المدرس</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
+
+let allData = [];
+let monthsOrder = [];
+
+fetch(sheetURL)
+.then(res => res.text())
+.then(data => {
+
+    const rows = data.split("\n").slice(1);
+
+    rows.forEach(row => {
+        const cols = row.split(",");
+        if(cols.length >= 7){
+
+            const record = {
+                id: cols[1],
+                name: cols[2],
+                date: cols[3],
+                month: cols[4],
+                program: cols[5]
+            };
+
+            allData.push(record);
+
+            document.querySelector("#studentsTable tbody").innerHTML += `
+            <tr>
+                <td>${cols[0]}</td>
+                <td>${cols[1]}</td>
+                <td>${cols[2]}</td>
+                <td>${cols[3]}</td>
+                <td>${cols[4]}</td>
+                <td>${cols[5]}</td>
+                <td>${cols[6]}</td>
+            </tr>`;
+        }
+    });
+
+    $('#studentsTable').DataTable({
+        responsive:true,
+        pageLength:10
+    });
+
+    initFilters();
+    calculate();
+});
+
+function initFilters(){
+
+    monthsOrder = [...new Set(allData.map(r => r.month))];
+
+    monthsOrder.forEach(month=>{
+        fromMonth.innerHTML += `<option value="${month}">${month}</option>`;
+        toMonth.innerHTML += `<option value="${month}">${month}</option>`;
+    });
+
+    const programs = [...new Set(allData.map(r => r.program))];
+    programs.forEach(p=>{
+        programFilter.innerHTML += `<option value="${p}">${p}</option>`;
+    });
+}
+
+function calculate(){
+
+    const fromIndex = monthsOrder.indexOf(fromMonth.value);
+    const toIndex = monthsOrder.indexOf(toMonth.value);
+    const selectedProgram = programFilter.value;
+
+    if(fromIndex === -1 || toIndex === -1 || fromIndex > toIndex) return;
+
+    const selectedMonths = monthsOrder.slice(fromIndex, toIndex+1);
+
+    let filtered = allData.filter(r =>
+        selectedMonths.includes(r.month) &&
+        (selectedProgram === "" || r.program === selectedProgram)
+    );
+
+    let attendanceMap = {};
+
+    filtered.forEach(r=>{
+        const key = r.id + "-" + r.name;
+
+        if(!attendanceMap[key]){
+            attendanceMap[key] = {
+                id: r.id,
+                name: r.name,
+                days: new Set()
+            };
+        }
+
+        attendanceMap[key].days.add(r.date + "-" + r.month);
+    });
+
+    let ranking = Object.values(attendanceMap)
+        .map(r => ({
+            id: r.id,
+            name: r.name,
+            count: r.days.size
+        }))
+        .sort((a,b)=> b.count - a.count);
+
+    rankingBody.innerHTML = "";
+
+    ranking.forEach((r, index)=>{
+        rankingBody.innerHTML += `
+        <tr>
+            <td>${index+1}</td>
+            <td>${r.name}</td>
+            <td>${r.id}</td>
+            <td>${r.count}</td>
+        </tr>`;
+    });
+}
+
+function toggleTable(){
+    const section = document.getElementById("studentsSection");
+    section.style.display = section.style.display === "none" ? "block" : "none";
+}
+
+</script>
+
+</body>
+</html>
