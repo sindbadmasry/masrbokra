@@ -70,6 +70,24 @@ button:hover {
   transform:translateY(-2px);
 }
 
+/* زر التقارير */
+.reports-btn {
+  display:block;
+  margin:15px auto 0 auto;
+  padding:12px 20px;
+  background: linear-gradient(135deg,#2c3e50,#34495e);
+  color:white;
+  font-weight:bold;
+  border-radius:12px;
+  text-decoration:none;
+  text-align:center;
+  transition:0.3s;
+}
+.reports-btn:hover {
+  background: linear-gradient(135deg,#1a252f,#2c3e50);
+  transform:translateY(-2px);
+}
+
 /* تسميات */
 label {
   display:block;
@@ -88,6 +106,7 @@ textarea {
 @media(max-width:400px){
   h2 { font-size:20px; }
   button { font-size:16px; padding:12px; }
+  .reports-btn { font-size:16px; padding:10px; }
 }
 </style>
 </head>
@@ -101,7 +120,6 @@ textarea {
     <textarea id="ids" placeholder="مثال: 1001 1002 1003"></textarea>
 
     <label>اختر البرامج (يمكن اختيار أكثر من برنامج):</label>
-    <!-- multiple select مع حجم أكبر ليظهر كقائمة منسدلة -->
     <select id="program" multiple size="6">
       <option value="تعليم">تعليم</option>
       <option value="صحة">صحة</option>
@@ -126,6 +144,10 @@ textarea {
     </select>
 
     <button onclick="submitAttendance()">✅ تسجيل الحضور</button>
+
+    <!-- زر التقارير -->
+    <a href="reports.html" class="reports-btn">📊 عرض التقارير</a>
+
   </div>
 </div>
 
@@ -135,7 +157,6 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUa_IntgITDBLcHgkf_
 function submitAttendance() {
   let ids = document.getElementById('ids').value.trim();
   let programSelect = document.getElementById('program');
-  // الحصول على كل البرامج المختارة
   let programs = Array.from(programSelect.selectedOptions).map(opt => opt.value);
   let teacher = document.getElementById('teacher').value;
 
@@ -145,12 +166,10 @@ function submitAttendance() {
 
   ids = ids.replace(/\n/g, ' ').replace(/\s+/g,' ').trim();
 
-  // تشغيل الرابط لكل برنامج
   programs.forEach(program => {
     let url = SCRIPT_URL + "?ids=" + encodeURIComponent(ids)
               + "&program=" + encodeURIComponent(program)
               + "&teacher=" + encodeURIComponent(teacher);
-    // فتح الرابط في نافذة جديدة لكل برنامج
     window.open(url, "_blank");
   });
 }
