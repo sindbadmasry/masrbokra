@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الحضور</title>
+<style>
+/* أسلوب عام */
+body {
+  font-family: 'Arial', sans-serif;
+  background:#f0f0f0;
+  margin:0;
+  padding:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
+/* الحاوية */
+.container {
+  width:90%;
+  max-width:400px;
+}
+
+/* بطاقة التسجيل */
+.card {
+  background: #fff;
+  border-radius:20px;
+  padding:25px 20px;
+  box-shadow:0 6px 15px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+/* العناوين */
+h2 {
+  margin-bottom:20px;
+  color: #333;
+  font-size:22px;
+}
+
+/* الحقول */
+textarea, select {
+  width:100%;
+  padding:12px;
+  margin-top:12px;
+  font-size:16px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+  resize: vertical;
+}
+
+/* زر التسجيل */
+button {
+  width:100%;
+  padding:14px;
+  margin-top:18px;
+  font-size:17px;
+  font-weight:bold;
+  background:#2e86de;
+  color:white;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
+}
+button:hover {
+  background:#1b4f72;
+  transform:translateY(-2px);
+}
+
+/* تسميات */
+label {
+  display:block;
+  text-align:right;
+  margin-top:15px;
+  font-weight:bold;
+  color:#333;
+}
+
+/* textarea للهواتف */
+textarea {
+  min-height:80px;
+}
+
+/* responsive adjustments */
+@media(max-width:400px){
+  h2 { font-size:20px; }
+  button { font-size:16px; padding:12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>📋 تسجيل الحضور</h2>
+
+    <label>أرقام الطلاب (IDs) مفصولة بمسافة أو سطر جديد:</label>
+    <textarea id="ids" placeholder="مثال: 1001 1002 1003"></textarea>
+
+    <label>اختر البرنامج:</label>
+    <select id="program">
+      <option value="">-- اختر البرنامج --</option>
+      <option value="تعليم">تعليم</option>
+      <option value="صحة">صحة</option>
+      <option value="كمبيوتر">كمبيوتر</option>
+      <option value="رياضة">رياضة</option>
+      <option value="بروك">بروك</option>
+      <option value="فن">فن</option>
+    </select>
+
+    <label>اختر اسم المدرس:</label>
+    <select id="teacher">
+      <option value="">-- اختر المدرس --</option>
+      <option value="mohamed">mohamed</option>
+      <option value="karim">karim</option>
+      <option value="mostafa">mostafa</option>
+      <option value="sohaila">sohaila</option>
+      <option value="dawlat">dawlat</option>
+      <option value="alaa">alaa</option>
+      <option value="islam">islam</option>
+      <option value="salwa">salwa</option>
+      <option value="amer">amer</option>
+    </select>
+
+    <button onclick="submitAttendance()">✅ تسجيل الحضور</button>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUa_IntgITDBLcHgkf_KUTE2rhu4uMjfJBU2N6P3k1JrDmMB2RWiJF5woiSnV5LBiy/exec";
+
+function submitAttendance() {
+  var ids = document.getElementById('ids').value.trim();
+  var program = document.getElementById('program').value;
+  var teacher = document.getElementById('teacher').value;
+
+  if (!ids) { alert("⚠️ الرجاء إدخال أرقام الطلاب"); return; }
+  if (!program) { alert("⚠️ الرجاء اختيار البرنامج"); return; }
+  if (!teacher) { alert("⚠️ الرجاء اختيار اسم المدرس"); return; }
+
+  ids = ids.replace(/\n/g, ' ').replace(/\s+/g,' ').trim();
+
+  var url = SCRIPT_URL + "?ids=" + encodeURIComponent(ids)
+            + "&program=" + encodeURIComponent(program)
+            + "&teacher=" + encodeURIComponent(teacher);
+
+  // فتح الرابط في نافذة جديدة للتسجيل
+  window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
