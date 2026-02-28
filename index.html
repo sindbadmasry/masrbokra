@@ -100,9 +100,9 @@ textarea {
     <label>إدخل أرقام الاولاد مفصولة بمسافة</label>
     <textarea id="ids" placeholder="مثال: 1001 1002 1003"></textarea>
 
-    <label>اختر البرنامج:</label>
-    <select id="program">
-      <option value="">-- اختر البرنامج --</option>
+    <label>اختر البرامج (يمكن اختيار أكثر من برنامج):</label>
+    <!-- multiple select مع حجم أكبر ليظهر كقائمة منسدلة -->
+    <select id="program" multiple size="6">
       <option value="تعليم">تعليم</option>
       <option value="صحة">صحة</option>
       <option value="كمبيوتر">كمبيوتر</option>
@@ -133,26 +133,28 @@ textarea {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUa_IntgITDBLcHgkf_KUTE2rhu4uMjfJBU2N6P3k1JrDmMB2RWiJF5woiSnV5LBiy/exec";
 
 function submitAttendance() {
-  var ids = document.getElementById('ids').value.trim();
-  var program = document.getElementById('program').value;
-  var teacher = document.getElementById('teacher').value;
+  let ids = document.getElementById('ids').value.trim();
+  let programSelect = document.getElementById('program');
+  // الحصول على كل البرامج المختارة
+  let programs = Array.from(programSelect.selectedOptions).map(opt => opt.value);
+  let teacher = document.getElementById('teacher').value;
 
   if (!ids) { alert("⚠️ الرجاء إدخال أرقام الطلاب"); return; }
-  if (!program) { alert("⚠️ الرجاء اختيار البرنامج"); return; }
+  if (programs.length === 0) { alert("⚠️ الرجاء اختيار برنامج واحد على الأقل"); return; }
   if (!teacher) { alert("⚠️ الرجاء اختيار اسم المدرس"); return; }
 
   ids = ids.replace(/\n/g, ' ').replace(/\s+/g,' ').trim();
 
-  var url = SCRIPT_URL + "?ids=" + encodeURIComponent(ids)
-            + "&program=" + encodeURIComponent(program)
-            + "&teacher=" + encodeURIComponent(teacher);
-
-  // فتح الرابط في نافذة جديدة للتسجيل
-  window.open(url, "_blank");
+  // تشغيل الرابط لكل برنامج
+  programs.forEach(program => {
+    let url = SCRIPT_URL + "?ids=" + encodeURIComponent(ids)
+              + "&program=" + encodeURIComponent(program)
+              + "&teacher=" + encodeURIComponent(teacher);
+    // فتح الرابط في نافذة جديدة لكل برنامج
+    window.open(url, "_blank");
+  });
 }
 </script>
 
 </body>
-
 </html>
-
