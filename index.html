@@ -1,179 +1,260 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل حضور جمعية مصر بكرة </title>
-<style>
-/* أسلوب عام */
-body {
-  font-family: 'Arial', sans-serif;
-  background:#f0f0f0;
-  margin:0;
-  padding:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جمعية مصر بكرة </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --p: #4834d4; --s: #686de0; --success: #27ae60; --bg: #f4f7f9; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; color: #2d3436; }
+        .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px 15px; }
+        .page { display: none; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: var(--white); border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .filter-box { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
+        .chips { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { background: #eee; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .chip.active { background: var(--p); color: white; }
+        .date-inputs { display: flex; gap: 10px; align-items: center; font-size: 0.8rem; }
+        .date-inputs input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+        
+        /* أزرار الترتيب الذكي */
+        .sort-bar { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding: 5px 0; }
+        .sort-btn { background: #f0f0f0; border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; color: #666; white-space: nowrap; }
+        .sort-btn i { margin-left: 4px; }
+        .sort-btn.active { background: var(--s); color: white; }
 
-/* الحاوية */
-.container {
-  width:90%;
-  max-width:400px;
-}
-
-/* بطاقة التسجيل */
-.card {
-  background: #fff;
-  border-radius:20px;
-  padding:25px 20px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1);
-  text-align:center;
-}
-
-/* العناوين */
-h2 {
-  margin-bottom:20px;
-  color: #333;
-  font-size:22px;
-}
-
-/* الحقول */
-textarea, select {
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  font-size:16px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
-  resize: vertical;
-}
-
-/* زر التسجيل */
-button {
-  width:100%;
-  padding:14px;
-  margin-top:18px;
-  font-size:17px;
-  font-weight:bold;
-  background:#2e86de;
-  color:white;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  transition:0.2s;
-}
-button:hover {
-  background:#1b4f72;
-  transform:translateY(-2px);
-}
-
-/* زر التقارير */
-.reports-btn {
-  display:block;
-  margin:15px auto 0 auto;
-  padding:12px 20px;
-  background: linear-gradient(135deg,#2c3e50,#34495e);
-  color:white;
-  font-weight:bold;
-  border-radius:12px;
-  text-decoration:none;
-  text-align:center;
-  transition:0.3s;
-}
-.reports-btn:hover {
-  background: linear-gradient(135deg,#1a252f,#2c3e50);
-  transform:translateY(-2px);
-}
-
-/* تسميات */
-label {
-  display:block;
-  text-align:right;
-  margin-top:15px;
-  font-weight:bold;
-  color:#333;
-}
-
-/* textarea للهواتف */
-textarea {
-  min-height:80px;
-}
-
-/* responsive adjustments */
-@media(max-width:400px){
-  h2 { font-size:20px; }
-  button { font-size:16px; padding:12px; }
-  .reports-btn { font-size:16px; padding:10px; }
-}
-</style>
+        .table-res { overflow-x: auto; margin-top: 10px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; }
+        td { padding: 10px; border-bottom: 1px solid #f1f1f1; text-align: center; }
+        .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .prog-item { background: #f9f9f9; padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .prog-item.selected { border-color: var(--p); background: #eeebff; }
+        .prog-item i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; cursor: pointer; font-size: 0.75rem; }
+        .nav-item.active { color: var(--p); font-weight: bold; }
+        .nav-item i { display: block; font-size: 1.4rem; }
+        .stat-line { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px dotted #ccc; }
+        .stat-val { font-weight: bold; color: var(--p); }
+        .btn-sync { width: 100%; background: var(--success); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="card">
-    <h2>📋 تسجيل حضور مصر بكرة</h2>
+    <div id="globalFilter" class="filter-box" style="display:none;">
+        <div class="chips">
+            <div class="chip" onclick="setDateRange('today', this)">اليوم</div>
+            <div class="chip" onclick="setDateRange('month', this)">هذا الشهر</div>
+            <div class="chip active" onclick="setDateRange('all', this)">كل الأوقات</div>
+        </div>
+        <div class="date-inputs">
+            <span>من:</span><input type="date" id="fDate" onchange="runAnalysis()">
+            <span>إلى:</span><input type="date" id="tDate" onchange="runAnalysis()">
+        </div>
+    </div>
 
-    <label>إدخل أرقام الاولاد مفصولة بمسافة</label>
-    <textarea id="ids" placeholder="مثال: 1001 1002 1003"></textarea>
-
-    <label>اختر البرامج (يمكن اختيار أكثر من برنامج):</label>
-    <select id="program" multiple size="6">
-      <option value="تعليم">تعليم</option>
-      <option value="صحة">صحة</option>
-      <option value="كمبيوتر">كمبيوتر</option>
-      <option value="رياضة">رياضة</option>
-      <option value="بروك">بروك</option>
-      <option value="فن">فن</option>
-    </select>
-
-    <label>اختر اسم المدرس:</label>
-    <select id="teacher">
-      <option value="">-- اختر المدرس --</option>
-      <option value="mohamed">mohamed</option>
+    <div id="entryP" class="page active">
+        <div class="card">
+            <h3><i class="fas fa-plus-circle"></i> تسجيل جديد</h3>
+            <textarea id="ids" rows="3" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" placeholder="أدخل IDs الطلاب..."></textarea>
+            <div class="prog-grid">
+                <div class="prog-item" data-v="تعليم" onclick="this.classList.toggle('selected')"><i class="fas fa-graduation-cap" style="color:#27ae60"></i><span>تعليم</span></div>
+                <div class="prog-item" data-v="صحة" onclick="this.classList.toggle('selected')"><i class="fas fa-heartbeat" style="color:#e74c3c"></i><span>صحة</span></div>
+                <div class="prog-item" data-v="كمبيوتر" onclick="this.classList.toggle('selected')"><i class="fas fa-desktop" style="color:#3498db"></i><span>كمبيوتر</span></div>
+                <div class="prog-item" data-v="رياضة" onclick="this.classList.toggle('selected')"><i class="fas fa-horse" style="color:#f1c40f"></i><span>رياضة</span></div>
+                <div class="prog-item" data-v="بروك" onclick="this.classList.toggle('selected')"><i class="fas fa-donkey" style="color:#9b59b6"></i><span>بروك</span></div>
+                <div class="prog-item" data-v="فن" onclick="this.classList.toggle('selected')"><i class="fas fa-palette" style="color:#fd79a8"></i><span>فن</span></div>
+            </div>
+            <select id="teacher" style="width:100%; padding:12px; border-radius:10px; margin-bottom:10px;">
+                <option value="">-- اختر المدرس --</option>
+                <option value="mohamed">mohamed</option>
       <option value="karim">karim</option>
       <option value="mostafa">mostafa</option>
       <option value="sohaila">sohaila</option>
       <option value="dawlat">dawlat</option>
       <option value="alaa">alaa</option>
       <option value="islam">islam</option>
-      <option value="salwa">salwa</option>
-      <option value="amer">amer</option>
-    </select>
+            </select>
+            <button class="btn-sync" style="background:var(--p)" onclick="send()">حفظ البيانات</button>
+        </div>
+    </div>
 
-    <button onclick="submitAttendance()">✅ تسجيل الحضور</button>
+    <div id="reportsP" class="page">
+        <button class="btn-sync" onclick="sync()">تحديث وجلب البيانات</button>
+        <div class="card">
+            <input type="text" id="sInput" onkeyup="searchTable()" placeholder="بحث بالاسم أو ID..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
+            
+            <div class="sort-bar">
+                <button class="sort-btn" onclick="smartSort('days', this)"><i class="fas fa-calendar-check"></i> الأكثر حضوراً</button>
+                <button class="sort-btn" onclick="smartSort('lecs', this)"><i class="fas fa-book-open"></i> الأكثر حصصاً</button>
+                <button class="sort-btn" onclick="smartSort('id', this)"><i class="fas fa-sort-numeric-down"></i> حسب ID</button>
+            </div>
 
-    <!-- زر التقارير -->
-    <a href="reports.html" class="reports-btn">📊 عرض التقارير</a>
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>الاسم</th><th>الفترة</th><th>أيام</th><th>حصص</th></tr>
+                    </thead>
+                    <tbody id="tBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-  </div>
+    <div id="statsP" class="page">
+        <button class="btn-sync" onclick="sync()">تحديث وتحليل البيانات</button>
+        <div class="card" id="statsRes">
+            <p style="text-align:center">اضغط على زر التحديث أعلاه لبدء التحليل</p>
+        </div>
+    </div>
 </div>
 
+<nav class="nav">
+    <div class="nav-item active" onclick="show('entryP', this)"><i class="fas fa-edit"></i><span>تسجيل</span></div>
+    <div class="nav-item" onclick="show('reportsP', this)"><i class="fas fa-file-alt"></i><span>التقارير</span></div>
+    <div class="nav-item" onclick="show('statsP', this)"><i class="fas fa-chart-bar"></i><span>الإحصائيات</span></div>
+</nav>
+
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUa_IntgITDBLcHgkf_KUTE2rhu4uMjfJBU2N6P3k1JrDmMB2RWiJF5woiSnV5LBiy/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5C7A9v8iDVmaDFY0fCPPG-LEXWGrU223ETGbRyITOr5lsLkOuzxLQ6o5lvyMjuUKP/exec";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
+    
+    let raw = [];
+    let currentProcessedData = [];
 
-function submitAttendance() {
-  let ids = document.getElementById('ids').value.trim();
-  let programSelect = document.getElementById('program');
-  let programs = Array.from(programSelect.selectedOptions).map(opt => opt.value);
-  let teacher = document.getElementById('teacher').value;
+    function show(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('globalFilter').style.display = (id==='entryP') ? 'none' : 'block';
+    }
 
-  if (!ids) { alert("⚠️ الرجاء إدخال أرقام الطلاب"); return; }
-  if (programs.length === 0) { alert("⚠️ الرجاء اختيار برنامج واحد على الأقل"); return; }
-  if (!teacher) { alert("⚠️ الرجاء اختيار اسم المدرس"); return; }
+    async function sync() {
+        const btns = document.querySelectorAll('.btn-sync');
+        btns.forEach(b => b.innerText = "جاري المزامنة...");
+        try {
+            const res = await fetch(CSV_URL);
+            const text = await res.text();
+            raw = text.split('\n').map(r => r.split(',')).slice(1);
+            runAnalysis();
+        } catch(e) { alert("فشل الاتصال"); }
+        btns[0].innerText = "تحديث وجلب البيانات";
+        btns[1].innerText = "تحديث وتحليل البيانات";
+    }
 
-  ids = ids.replace(/\n/g, ' ').replace(/\s+/g,' ').trim();
+    function runAnalysis() {
+        if(raw.length === 0) return;
+        const from = document.getElementById('fDate').value;
+        const to = document.getElementById('tDate').value;
+        
+        const filteredRaw = raw.filter(r => {
+            const d = r[3]?.trim();
+            if(!d) return false;
+            if(from && d < from) return false;
+            if(to && d > to) return false;
+            return true;
+        });
 
-  programs.forEach(program => {
-    let url = SCRIPT_URL + "?ids=" + encodeURIComponent(ids)
-              + "&program=" + encodeURIComponent(program)
-              + "&teacher=" + encodeURIComponent(teacher);
-    window.open(url, "_blank");
-  });
-}
+        const sMap = {}; 
+        const teacherDays = {};
+        const progStats = {}; 
+        const periodDays = { "صباحي": new Set(), "مسائي": new Set() };
+        const totalWorkDates = new Set();
+
+        filteredRaw.forEach(r => {
+            const [ts, id, name, date, mon, prog, teacher, period] = r.map(c => c?.trim());
+            if(!id) return;
+
+            if(!sMap[id]) sMap[id] = {id, name, period, days: new Set(), lecs: 0};
+            sMap[id].days.add(date);
+            sMap[id].lecs++;
+
+            if(periodDays[period]) periodDays[period].add(date);
+            totalWorkDates.add(date);
+
+            if(!teacherDays[teacher]) teacherDays[teacher] = new Set();
+            teacherDays[teacher].add(date);
+
+            const progKey = `${prog}-${period}-${date}`;
+            if(!progStats[prog]) progStats[prog] = new Set();
+            progStats[prog].add(progKey);
+        });
+
+        currentProcessedData = Object.values(sMap);
+        renderReports(currentProcessedData);
+        renderStats(currentProcessedData, totalWorkDates.size, periodDays, teacherDays, progStats);
+    }
+
+    function renderReports(data) {
+        document.getElementById('tBody').innerHTML = data.map(s => `
+            <tr><td>${s.id}</td><td>${s.name}</td><td>${s.period}</td><td>${s.days.size}</td><td>${s.lecs}</td></tr>
+        `).join('');
+    }
+
+    function smartSort(type, btn) {
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if(type === 'days') currentProcessedData.sort((a,b) => b.days.size - a.days.size);
+        else if(type === 'lecs') currentProcessedData.sort((a,b) => b.lecs - a.lecs);
+        else if(type === 'id') currentProcessedData.sort((a,b) => parseInt(a.id) - parseInt(b.id));
+        
+        renderReports(currentProcessedData);
+    }
+
+    function renderStats(students, totalDays, pDays, tDays, pStats) {
+        const over50 = students.filter(s => (s.days.size / (totalDays || 1)) >= 0.5).length;
+        let html = `
+            <h3><i class="fas fa-chart-line"></i> نتائج الفترة المحددة</h3>
+            <div class="stat-line"><span>إجمالي الأولاد الحاضرين:</span> <span class="stat-val">${students.length}</span></div>
+            <div class="stat-line"><span>إجمالي أيام العمل:</span> <span class="stat-val">${totalDays}</span></div>
+            <div class="stat-line" style="background:#e8f5e9"><span>تخطوا 50% حضور:</span> <span class="stat-val">${over50}</span></div>
+            <hr>
+            <p><b>أيام العمل لكل فترة:</b></p>
+            <div class="stat-line"><span>صباحي:</span> <span>${pDays["صباحي"].size} يوم</span></div>
+            <div class="stat-line"><span>مسائي:</span> <span>${pDays["مسائي"].size} يوم</span></div>
+            <hr>
+            <p><b>حضور المدرسين (أيام):</b></p>
+            ${Object.entries(tDays).map(([n, d]) => `<div class="stat-line"><span>${n}:</span> <span>${d.size} يوم</span></div>`).join('')}
+            <hr>
+            <p><b>محاضرات البرامج:</b></p>
+            ${Object.entries(pStats).map(([n, s]) => `<div class="stat-line"><span>${n}:</span> <span>${s.size} محاضرة</span></div>`).join('')}
+        `;
+        document.getElementById('statsRes').innerHTML = html;
+    }
+
+    function setDateRange(type, el) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        const today = new Date().toISOString().split('T')[0];
+        if(type==='today') { document.getElementById('fDate').value = today; document.getElementById('tDate').value = today; }
+        else if(type==='month') { 
+            const first = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            document.getElementById('fDate').value = first; document.getElementById('tDate').value = today;
+        } else { document.getElementById('fDate').value = ""; document.getElementById('tDate').value = ""; }
+        runAnalysis();
+    }
+
+    async function send() {
+        const ids = document.getElementById('ids').value;
+        const teach = document.getElementById('teacher').value;
+        const progs = Array.from(document.querySelectorAll('.prog-item.selected')).map(i => i.getAttribute('data-v'));
+        if(!ids || progs.length===0 || !teach) return alert("اكمل البيانات");
+        alert("جاري الحفظ...");
+        for(let p of progs) { await fetch(`${SCRIPT_URL}?ids=${encodeURIComponent(ids)}&program=${encodeURIComponent(p)}&teacher=${encodeURIComponent(teach)}`, {mode:'no-cors'}); }
+        alert("تم!"); location.reload();
+    }
+
+    function searchTable() {
+        const val = document.getElementById('sInput').value.toLowerCase();
+        document.querySelectorAll('#tBody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
+    }
 </script>
-
 </body>
 </html>
