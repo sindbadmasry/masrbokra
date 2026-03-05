@@ -543,14 +543,14 @@ function processData() {
     // --- الجزء الخاص بالصورة ---
     // قم بتغيير الرابط أدناه لرابط مجلد صورك الحقيقي
     // سنفترض أن الصور بصيغة .jpg واسم الصورة هو رقم الكود
-    const studentImgUrl = `https://your-domain.com/photos/${id}.jpg`; 
+    const studentImgUrl = `http://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
     
     const modalImg = document.getElementById('modalImg');
     modalImg.src = studentImgUrl;
 
     // في حال عدم وجود صورة لهذا الطالب، نضع صورة افتراضية
     modalImg.onerror = function() {
-        this.src = "https://via.placeholder.com/150?text=No+Photo";
+        this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg";
     };
     // -------------------------
 
@@ -568,6 +568,7 @@ function processData() {
 </script>
 </body>
 </html>
+
 
 
 
