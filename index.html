@@ -3,259 +3,513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جمعية مصر بكرة </title>
+    <title>منظومة مصر بكرة - النسخة المحدثة V5.1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --p: #4834d4; --s: #686de0; --success: #27ae60; --bg: #f4f7f9; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; color: #2d3436; }
-        .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px 15px; }
-        .page { display: none; animation: fadeIn 0.3s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--white); border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .filter-box { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
-        .chips { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; }
-        .chip { background: #eee; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .chip.active { background: var(--p); color: white; }
-        .date-inputs { display: flex; gap: 10px; align-items: center; font-size: 0.8rem; }
-        .date-inputs input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
-        
-        /* أزرار الترتيب الذكي */
-        .sort-bar { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding: 5px 0; }
-        .sort-btn { background: #f0f0f0; border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; color: #666; white-space: nowrap; }
-        .sort-btn i { margin-left: 4px; }
-        .sort-btn.active { background: var(--s); color: white; }
+        :root { 
+            --primary: #4834d4; --secondary: #686de0; --success: #27ae60; 
+            --bg: #f4f7f9; --white: #ffffff; --text: #2d3436;
+        }
 
-        .table-res { overflow-x: auto; margin-top: 10px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; color: var(--text); overflow-x: hidden; }
+        .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px 15px; }
+
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
+        h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+
+        .filter-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
+        .chips-group { margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+        .chips-label { font-size: 0.75rem; color: #888; margin-bottom: 5px; display: block; }
+        .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { background: #eee; padding: 6px 15px; border-radius: 25px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .chip.active { background: var(--primary); color: white; }
+        
+        .date-inputs { display: flex; gap: 10px; align-items: center; font-size: 0.85rem; margin-top: 10px; }
+        .date-inputs input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
+
+        .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .prog-item { background: #f9f9f9; padding: 12px; border-radius: 15px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .prog-item i { display: block; font-size: 1.3rem; margin-bottom: 5px; }
+        .prog-item span { font-size: 0.75rem; font-weight: bold; }
+        .prog-item.selected { border-color: var(--primary); background: #eeebff; transform: scale(0.95); }
+
+        .multi-select-container { position: relative; margin-bottom: 15px; }
+        .select-box { padding: 12px; border: 1.5px solid #eee; border-radius: 12px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .dropdown-content { display: none; position: absolute; width: 100%; background: white; border: 1px solid #eee; border-radius: 12px; z-index: 10; max-height: 200px; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .dropdown-content.show { display: block; }
+        .dropdown-item { padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 25px; text-align: center; position: relative; animation: slideUp 0.3s; }
+        .close-modal { position: absolute; left: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
+        
+        .profile-img-container { width: 120px; height: 120px; margin: 0 auto 15px; position: relative; }
+        .profile-img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; background: #eee; }
+        
+        .badge-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+        .badge { background: #f1f2f6; color: #57606f; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
+
+        .student-link { color: var(--primary); font-weight: bold; text-decoration: underline; cursor: pointer; }
+        .table-res { overflow-x: auto; border-radius: 12px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.85rem; }
         th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; }
-        td { padding: 10px; border-bottom: 1px solid #f1f1f1; text-align: center; }
-        .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .prog-item { background: #f9f9f9; padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
-        .prog-item.selected { border-color: var(--p); background: #eeebff; }
-        .prog-item i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
-        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; cursor: pointer; font-size: 0.75rem; }
-        .nav-item.active { color: var(--p); font-weight: bold; }
-        .nav-item i { display: block; font-size: 1.4rem; }
-        .stat-line { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px dotted #ccc; }
-        .stat-val { font-weight: bold; color: var(--p); }
-        .btn-sync { width: 100%; background: var(--success); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
+        td { padding: 12px; border-bottom: 1px solid #f1f1f1; text-align: center; }
+
+        .btn-sync { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; cursor: pointer; font-size: 0.8rem; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { display: block; font-size: 1.5rem; }
+
+        #tableSearch { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="globalFilter" class="filter-box" style="display:none;">
-        <div class="chips">
-            <div class="chip" onclick="setDateRange('today', this)">اليوم</div>
-            <div class="chip" onclick="setDateRange('month', this)">هذا الشهر</div>
-            <div class="chip active" onclick="setDateRange('all', this)">كل الأوقات</div>
+    <div id="filterSection" class="filter-box" style="display:none;">
+        <div class="chips-group">
+            <span class="chips-label">الوقت:</span>
+            <div class="chips">
+                <div class="chip" onclick="quickDate('today', this)">اليوم</div>
+                <div class="chip" onclick="quickDate('month', this)">هذا الشهر</div>
+                <div class="chip active" onclick="quickDate('all', this)">كل الأوقات</div>
+            </div>
         </div>
+
+        <div class="chips-group">
+            <span class="chips-label">الفترة :</span>
+            <div class="chips">
+                <div class="chip active" data-type="shift" onclick="filterByShift('all', this)">الكل</div>
+                <div class="chip" data-type="shift" onclick="filterByShift('صباحي', this)">صباحي</div>
+                <div class="chip" data-type="shift" onclick="filterByShift('مسائي', this)">مسائي</div>
+                <div id="topSort" class="chip" style="background:#fff2e6; border:1px solid #ffd8b3;" onclick="toggleSort(this)">🏆 الأكثر حضوراً</div>
+            </div>
+        </div>
+
         <div class="date-inputs">
-            <span>من:</span><input type="date" id="fDate" onchange="runAnalysis()">
-            <span>إلى:</span><input type="date" id="tDate" onchange="runAnalysis()">
+            <span>من:</span> <input type="date" id="dateStart" onchange="processData()">
+            <span>إلى:</span> <input type="date" id="dateEnd" onchange="processData()">
         </div>
     </div>
 
-    <div id="entryP" class="page active">
+    <div id="pageEntry" class="page active">
         <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> تسجيل جديد</h3>
-            <textarea id="ids" rows="3" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" placeholder="أدخل IDs الطلاب..."></textarea>
-            <div class="prog-grid">
-                <div class="prog-item" data-v="تعليم" onclick="this.classList.toggle('selected')"><i class="fas fa-graduation-cap" style="color:#27ae60"></i><span>تعليم</span></div>
-                <div class="prog-item" data-v="صحة" onclick="this.classList.toggle('selected')"><i class="fas fa-heartbeat" style="color:#e74c3c"></i><span>صحة</span></div>
-                <div class="prog-item" data-v="كمبيوتر" onclick="this.classList.toggle('selected')"><i class="fas fa-desktop" style="color:#3498db"></i><span>كمبيوتر</span></div>
-                <div class="prog-item" data-v="رياضة" onclick="this.classList.toggle('selected')"><i class="fa fa-soccer-ball-o" style="color:#f1c40f"></i><span>رياضة</span></div>
-                <div class="prog-item" data-v="بروك" onclick="this.classList.toggle('selected')"><i class="fas fa-horse" style="color:#9b59b6"></i><span>بروك</span></div>
-                <div class="prog-item" data-v="فن" onclick="this.classList.toggle('selected')"><i class="fas fa-palette" style="color:#fd79a8"></i><span>فن</span></div>
-            </div>
-            <select id="teacher" style="width:100%; padding:12px; border-radius:10px; margin-bottom:10px;">
-                <option value="">-- اختر المدرس --</option>
-                <option value="mohamed">mohamed</option>
-      <option value="karim">karim</option>
-      <option value="mostafa">mostafa</option>
-      <option value="sohaila">sohaila</option>
-      <option value="dawlat">dawlat</option>
-      <option value="alaa">alaa</option>
-      <option value="islam">islam</option>
-            </select>
-            <button class="btn-sync" style="background:var(--p)" onclick="send()">حفظ البيانات</button>
-        </div>
-    </div>
-
-    <div id="reportsP" class="page">
-        <button class="btn-sync" onclick="sync()">تحديث وجلب البيانات</button>
-        <div class="card">
-            <input type="text" id="sInput" onkeyup="searchTable()" placeholder="بحث بالاسم أو ID..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
+            <h3><i class="fas fa-plus-circle"></i> تسجيل حضور الطلاب</h3>
+            <textarea id="inputIds" rows="3" style="width: 100%; padding:10px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;" placeholder="أدخل أرقام الطلاب مسافات أو أسطر..."></textarea>
             
-            <div class="sort-bar">
-                <button class="sort-btn" onclick="smartSort('days', this)"><i class="fas fa-calendar-check"></i> الأكثر حضوراً</button>
-                <button class="sort-btn" onclick="smartSort('lecs', this)"><i class="fas fa-book-open"></i> الأكثر حصصاً</button>
-                <button class="sort-btn" onclick="smartSort('id', this)"><i class="fas fa-sort-numeric-down"></i> حسب ID</button>
+            <div class="prog-grid">
+                <div class="prog-item" data-v="تعليم" onclick="toggleProg(this)"><i class="fas fa-graduation-cap" style="color:#27ae60"></i><span>تعليم</span></div>
+                <div class="prog-item" data-v="صحة" onclick="toggleProg(this)"><i class="fas fa-heartbeat" style="color:#e74c3c"></i><span>صحة</span></div>
+                <div class="prog-item" data-v="كمبيوتر" onclick="toggleProg(this)"><i class="fas fa-desktop" style="color:#3498db"></i><span>كمبيوتر</span></div>
+                <div class="prog-item" data-v="رياضة" onclick="toggleProg(this)"><i class="fas fa-volleyball-ball" style="color:#f1c40f"></i><span>رياضة</span></div>
+                <div class="prog-item" data-v="تدريب" onclick="toggleProg(this)"><i class="fas fa-dumbbell" style="color:#2d3436"></i><span>تدريب</span></div>
+                <div class="prog-item" data-v="بروك" onclick="toggleProg(this)"><i class="fas fa-campground" style="color:#e67e22"></i><span>بروك</span></div>
+                <div class="prog-item" data-v="حفلة" onclick="toggleProg(this)"><i class="fas fa-birthday-cake" style="color:#fd79a8"></i><span>حفلة</span></div>
+                <div class="prog-item" data-v="رحلة" onclick="toggleProg(this)"><i class="fas fa-bus" style="color:#1abc9c"></i><span>رحلة</span></div>
+                <div class="prog-item" data-v="فن" onclick="toggleProg(this)"><i class="fas fa-palette" style="color:#9b59b6"></i><span>فن</span></div>
             </div>
 
+            <div class="multi-select-container">
+                <div class="select-box" onclick="toggleTeachers()">
+                    <span id="teacherPlaceholder">-- اختر المدرسين --</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="teachersDropdown" class="dropdown-content">
+                    <label class="dropdown-item"><input type="checkbox" value="mohamed"> mohamed</label>
+                    <label class="dropdown-item"><input type="checkbox" value="karim"> karim</label>
+                    <label class="dropdown-item"><input type="checkbox" value="mostafa"> mostafa</label>
+                    <label class="dropdown-item"><input type="checkbox" value="osama"> osama</label>
+                    <label class="dropdown-item"><input type="checkbox" value="said"> said</label>
+                    <label class="dropdown-item"><input type="checkbox" value="sohaila"> sohaila</label>
+                    <label class="dropdown-item"><input type="checkbox" value="dawlat"> dawlat</label>
+                    <label class="dropdown-item"><input type="checkbox" value="alaa"> alaa</label>
+                </div>
+            </div>
+
+            <button class="btn-sync" style="background:var(--primary)" onclick="submitAttendance()">تسجيل الحضور</button>
+        </div>
+    </div>
+
+    <div id="pageReports" class="page">
+        <button class="btn-sync" onclick="fetchAndSync()">تحديث البيانات <i class="fas fa-sync"></i></button>
+        <div class="card">
+            <input type="text" id="tableSearch" onkeyup="filterSearch()" placeholder="بحث  بالكود أو الاسم...">
             <div class="table-res">
                 <table>
                     <thead>
-                        <tr><th>ID</th><th>الاسم</th><th>الفترة</th><th>أيام</th><th>حصص</th></tr>
+                        <tr><th>ID</th><th>الاسم</th><th>أيام الحضور</th><th>عدد الحصص</th></tr>
                     </thead>
-                    <tbody id="tBody"></tbody>
+                    <tbody id="reportTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="statsP" class="page">
-        <button class="btn-sync" onclick="sync()">تحديث وتحليل البيانات</button>
-        <div class="card" id="statsRes">
-            <p style="text-align:center">اضغط على زر التحديث أعلاه لبدء التحليل</p>
+    <div id="pageStats" class="page">
+        <div class="card">
+            <h3><i class="fas fa-chart-pie"></i> إحصائيات عامة</h3>
+            <div id="statsSummary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-chalkboard-teacher"></i> نشاط المدرسين (عدد أيام الحضور)</h3>
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>إسم المدرس</th>
+                            <th>عدد أيام العمل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersStatsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-tasks"></i> تحليل البرامج المنفذة</h3>
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>البرنامج</th>
+                            <th>أيام العمل</th>
+                            <th>إجمالي الحصص</th>
+                        </tr>
+                    </thead>
+                    <tbody id="programsStatsBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="profile-img-container">
+            <img id="modalImg" src="https://via.placeholder.com/150" class="profile-img">
+        </div>
+        <h2 id="modalName" style="margin: 0; color: var(--primary);">كود الطالب</h2>
+        <div style="background: #f8f9fa; border-radius: 15px; padding: 15px; margin: 15px 0; display: flex; justify-content: space-around;">
+             <div><small>أيام الحضور</small><br><strong id="modalDays">0</strong></div>
+            <div><small>إجمالي الحصص</small><br><strong id="modalLecs">0</strong></div>
+        </div>
+        <div class="badge-list" id="modalProgList"></div>
+    </div>
+</div>
+
 <nav class="nav">
-    <div class="nav-item active" onclick="show('entryP', this)"><i class="fas fa-edit"></i><span>تسجيل</span></div>
-    <div class="nav-item" onclick="show('reportsP', this)"><i class="fas fa-file-alt"></i><span>التقارير</span></div>
-    <div class="nav-item" onclick="show('statsP', this)"><i class="fas fa-chart-bar"></i><span>الإحصائيات</span></div>
+    <div class="nav-item active" onclick="navigate('pageEntry', this)"><i class="fas fa-plus-circle"></i><span>تسجيل</span></div>
+    <div class="nav-item" onclick="navigate('pageReports', this)"><i class="fas fa-file-invoice"></i><span>التقارير</span></div>
+    <div class="nav-item" onclick="navigate('pageStats', this)"><i class="fas fa-chart-line"></i><span>إحصائيات</span></div>
 </nav>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5C7A9v8iDVmaDFY0fCPPG-LEXWGrU223ETGbRyITOr5lsLkOuzxLQ6o5lvyMjuUKP/exec";
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
-    
-    let raw = [];
-    let currentProcessedData = [];
+    const GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbz4xugO-5lish7nbQAiizHDAEzUDsrx_RAEdKCGi-26iYI3mO1C0x8pQVlYIsN8HDW9/exec";
+    const ATTENDANCE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
+    const STUDENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=0&single=true&output=csv";
 
-    function show(id, el) {
+    let rawAttendance = [];
+    let studentsShiftData = {}; 
+    let finalProcessedData = {};
+    let teacherStats = {};
+    let programStats = {};
+    let selectedShift = 'all';
+    let isSortingActive = false;
+
+    function navigate(pageId, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.getElementById(pageId).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        document.getElementById('globalFilter').style.display = (id==='entryP') ? 'none' : 'block';
+        document.getElementById('filterSection').style.display = (pageId === 'pageEntry') ? 'none' : 'block';
     }
 
-    async function sync() {
-        const btns = document.querySelectorAll('.btn-sync');
-        btns.forEach(b => b.innerText = "جاري المزامنة...");
+    function toggleProg(el) { el.classList.toggle('selected'); }
+    function toggleTeachers() { document.getElementById('teachersDropdown').classList.toggle('show'); }
+
+// 1. تعديل دالة الإرسال - سنضع نقطة بين كل كود والآخر لإجبار الشيت على التعامل معها كنص
+async function submitAttendance() {
+    let idsInput = document.getElementById('inputIds').value.trim();
+    const teachers = Array.from(document.querySelectorAll('#teachersDropdown input:checked')).map(i => i.value).join(' & ');
+    const progs = Array.from(document.querySelectorAll('.prog-item.selected')).map(i => i.dataset.v).join(' & ');
+
+    if(!idsInput || !teachers || !progs) return alert("برجاء إدخال الأكواد واختيار المدرس والبرامج");
+
+    // تنظيف المدخلات وتحويل أي فاصل (مسافة أو سطر) إلى نقطة محاطة بمسافات
+    // مثال: "50 51" تصبح "50 . 51"
+    let idsProcessed = idsInput.split(/[\s\n,]+/).filter(i => i.length > 0).join(' . ');
+
+    const url = `${GOOGLE_SCRIPT}?ids=${encodeURIComponent(idsProcessed)}&program=${encodeURIComponent(progs)}&teacher=${encodeURIComponent(teachers)}`;
+    
+    try {
+        const img = new Image();
+        img.src = url;
+        alert("تم تسجيل الحضور بنجاح");
+        document.getElementById('inputIds').value = "";
+        document.querySelectorAll('.prog-item').forEach(p => p.classList.remove('selected'));
+        document.querySelectorAll('#teachersDropdown input').forEach(i => i.checked = false);
+    } catch (e) { alert("حدث خطأ في الاتصال"); }
+}
+
+    async function fetchAndSync() {
+        const btn = document.querySelector('.btn-sync');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
         try {
-            const res = await fetch(CSV_URL);
-            const text = await res.text();
-            raw = text.split('\n').map(r => r.split(',')).slice(1);
-            runAnalysis();
-        } catch(e) { alert("فشل الاتصال"); }
-        btns[0].innerText = "تحديث وجلب البيانات";
-        btns[1].innerText = "تحديث وتحليل البيانات";
+            const resStu = await fetch(STUDENTS_CSV);
+            const textStu = await resStu.text();
+            const rowsStu = textStu.split('\n').map(r => r.split(','));
+            studentsShiftData = {};
+            rowsStu.slice(1).forEach(r => {
+                const id = r[0]?.trim();
+                const name = r[1]?.trim();
+                const shift = r[2]?.trim();
+                if(id) studentsShiftData[id] = { name, shift };
+            });
+
+            const resAtt = await fetch(ATTENDANCE_CSV);
+            const textAtt = await resAtt.text();
+            rawAttendance = textAtt.split('\n').map(r => r.split(',')).slice(1);
+            
+            processData();
+        } catch(e) { 
+            console.error(e);
+            alert("فشل جلب البيانات. تأكد من نشر الشيت بصيغة CSV"); 
+        }
+        btn.innerHTML = 'تحديث البيانات <i class="fas fa-sync"></i>';
     }
 
-    function runAnalysis() {
-        if(raw.length === 0) return;
-        const from = document.getElementById('fDate').value;
-        const to = document.getElementById('tDate').value;
+    // 2. تعديل دالة المعالجة لتقرأ الأعمدة بترتيب ثابت وتفكك الأكواد
+// 2. تعديل دالة المعالجة - لتقرأ الأكواد وتتجاهل النقاط
+function processData() {
+    const start = document.getElementById('dateStart').value;
+    const end = document.getElementById('dateEnd').value;
+    
+    finalProcessedData = {};
+    teacherStats = {};
+    programStats = {};
+
+    rawAttendance.forEach(row => {
+        if(row.length < 7) return;
         
-        const filteredRaw = raw.filter(r => {
-            const d = r[3]?.trim();
-            if(!d) return false;
-            if(from && d < from) return false;
-            if(to && d > to) return false;
-            return true;
+        // جلب خلية الأكواد وتنظيفها
+        let idsRaw = row[1] ? row[1].replace(/"/g, '').trim() : "";
+        let date = row[3] ? row[3].trim() : "";
+        let progsRaw = row[5] ? row[5].replace(/"/g, '').trim() : "";
+        let teacherRaw = row[6] ? row[6].replace(/"/g, '').trim() : "";
+
+        if(!idsRaw || !date) return;
+        if(start && date < start) return;
+        if(end && date > end) return;
+
+        // تفكيك الأكواد: نبحث عن أي أرقام ونتجاهل النقاط أو المسافات
+        // هذا السطر سيفصل "50 . 51" إلى [50, 51] بشكل صحيح تماماً
+        const idList = idsRaw.split(/[^\d]+/).filter(i => i.length > 0);
+        
+        const progList = progsRaw ? progsRaw.split('&').map(p => p.trim()) : [];
+        const teacherList = teacherRaw ? teacherRaw.split('&').map(t => t.trim()) : [];
+
+        idList.forEach(id => {
+            // التحقق من وجود الطالب في القائمة الرسمية
+            if (!studentsShiftData[id]) return; 
+
+            const sInfo = studentsShiftData[id];
+            if(selectedShift !== 'all' && sInfo.shift !== selectedShift) return;
+
+            if(!finalProcessedData[id]) {
+                finalProcessedData[id] = { id, name: sInfo.name, days: new Set(), lecs: 0, progs: new Set() };
+            }
+            finalProcessedData[id].days.add(date);
+            finalProcessedData[id].lecs += progList.length;
+            progList.forEach(p => finalProcessedData[id].progs.add(p));
         });
 
-        const sMap = {}; 
-        const teacherDays = {};
-        const progStats = {}; 
-        const periodDays = { "صباحي": new Set(), "مسائي": new Set() };
-        const totalWorkDates = new Set();
-
-        filteredRaw.forEach(r => {
-            const [ts, id, name, date, mon, prog, teacher, period] = r.map(c => c?.trim());
-            if(!id) return;
-
-            if(!sMap[id]) sMap[id] = {id, name, period, days: new Set(), lecs: 0};
-            sMap[id].days.add(date);
-            sMap[id].lecs++;
-
-            if(periodDays[period]) periodDays[period].add(date);
-            totalWorkDates.add(date);
-
-            if(!teacherDays[teacher]) teacherDays[teacher] = new Set();
-            teacherDays[teacher].add(date);
-
-            const progKey = `${prog}-${period}-${date}`;
-            if(!progStats[prog]) progStats[prog] = new Set();
-            progStats[prog].add(progKey);
+        // إحصائيات المدرسين
+        teacherList.forEach(t => {
+            if(t && t.length > 1) { // التأكد أنه ليس رقماً تائهاً
+                if(!teacherStats[t]) teacherStats[t] = new Set();
+                teacherStats[t].add(date);
+            }
         });
 
-        currentProcessedData = Object.values(sMap);
-        renderReports(currentProcessedData);
-        renderStats(currentProcessedData, totalWorkDates.size, periodDays, teacherDays, progStats);
-    }
+        // إحصائيات البرامج
+        progList.forEach(p => {
+            if(p && p.length > 1) {
+                if(!programStats[p]) programStats[p] = { days: new Set(), totalLecs: 0 };
+                programStats[p].days.add(date);
+                programStats[p].totalLecs++;
+            }
+        });
+    });
 
-    function renderReports(data) {
-        document.getElementById('tBody').innerHTML = data.map(s => `
-            <tr><td>${s.id}</td><td>${s.name}</td><td>${s.period}</td><td>${s.days.size}</td><td>${s.lecs}</td></tr>
+    renderTable();
+    renderStats();
+}
+    const start = document.getElementById('dateStart').value;
+    const end = document.getElementById('dateEnd').value;
+    
+    finalProcessedData = {};
+    teacherStats = {};
+    programStats = {};
+
+    rawAttendance.forEach(row => {
+        // نتحقق أن الصف يحتوي على الحد الأدنى من الأعمدة لضمان عدم قراءة صفوف فارغة
+        if(row.length < 6) return;
+        
+        // جلب البيانات من الأعمدة (ترتيب الأعمدة في الشيت: 0:Timestamp, 1:IDs, 2:Status, 3:Date, 4:Month, 5:Prog, 6:Teacher)
+        let idsRaw = row[1] ? row[1].replace(/"/g, '').trim() : "";
+        let date = row[3] ? row[3].trim() : "";
+        let progsRaw = row[5] ? row[5].replace(/"/g, '').trim() : "";
+        let teacherRaw = row[6] ? row[6].replace(/"/g, '').trim() : "";
+
+        if(!idsRaw || !date) return;
+        if(start && date < start) return;
+        if(end && date > end) return;
+
+        // تفكيك الأكواد: نستخدم المسافة فقط كفاصل داخل الخلية
+        const idList = idsRaw.split(/\s+/).filter(i => i.length > 0);
+        const progList = progsRaw ? progsRaw.split('&').map(p => p.trim()) : [];
+        const teacherList = teacherRaw ? teacherRaw.split('&').map(t => t.trim()) : [];
+
+        idList.forEach(id => {
+            // أهم خطوة: تجاهل أي كود غير موجود في شيت الطلاب (يمنع ظهور المدرسين كأكواد)
+            if (!studentsShiftData[id]) return; 
+
+            const sInfo = studentsShiftData[id];
+            if(selectedShift !== 'all' && sInfo.shift !== selectedShift) return;
+
+            if(!finalProcessedData[id]) {
+                finalProcessedData[id] = { id, name: sInfo.name, days: new Set(), lecs: 0, progs: new Set() };
+            }
+            finalProcessedData[id].days.add(date);
+            finalProcessedData[id].lecs += progList.length;
+            progList.forEach(p => finalProcessedData[id].progs.add(p));
+        });
+
+        // إحصائيات المدرسين (تعتمد على عمود المدرسين فقط)
+        teacherList.forEach(t => {
+            if(t && t !== "") {
+                if(!teacherStats[t]) teacherStats[t] = new Set();
+                teacherStats[t].add(date);
+            }
+        });
+
+        // إحصائيات البرامج (تعتمد على عمود البرامج فقط)
+        progList.forEach(p => {
+            if(p && p !== "") {
+                if(!programStats[p]) programStats[p] = { days: new Set(), totalLecs: 0 };
+                programStats[p].days.add(date);
+                programStats[p].totalLecs++;
+            }
+        });
+    });
+
+    renderTable();
+    renderStats();
+
+    function renderTable() {
+        let items = Object.values(finalProcessedData);
+        if(isSortingActive) items.sort((a, b) => b.days.size - a.days.size);
+
+        const html = items.map(s => `
+            <tr>
+                <td><span class="student-link" onclick="openProfile('${s.id}')">${s.id}</span></td>
+                <td>${s.name || '---'}</td>
+                <td><b>${s.days.size}</b> يوم</td>
+                <td>${s.lecs} حصص</td>
+            </tr>
         `).join('');
+        document.getElementById('reportTableBody').innerHTML = html || '<tr><td colspan="4">لا توجد بيانات تطابق الفلتر</td></tr>';
     }
 
-    function smartSort(type, btn) {
-        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    function renderStats() {
+        const count = Object.keys(finalProcessedData).length;
+        const summary = document.getElementById('statsSummary');
+        if(summary) {
+            summary.innerHTML = `
+                <div style="background:#eeebff; padding:10px; border-radius:10px; text-align:center;">
+                    <small>إجمالي الطلاب</small><br><strong>${count}</strong>
+                </div>
+                <div style="background:#e3fcef; padding:10px; border-radius:10px; text-align:center;">
+                    <small>الفترة</small><br><strong>${selectedShift === 'all' ? 'الكل' : selectedShift}</strong>
+                </div>
+            `;
+        }
 
-        if(type === 'days') currentProcessedData.sort((a,b) => b.days.size - a.days.size);
-        else if(type === 'lecs') currentProcessedData.sort((a,b) => b.lecs - a.lecs);
-        else if(type === 'id') currentProcessedData.sort((a,b) => parseInt(a.id) - parseInt(b.id));
-        
-        renderReports(currentProcessedData);
+        // جدول المدرسين
+        let tHtml = "";
+        for(let t in teacherStats) {
+            tHtml += `<tr><td>${t}</td><td><b>${teacherStats[t].size}</b> يوم</td></tr>`;
+        }
+        document.getElementById('teachersStatsBody').innerHTML = tHtml || '<tr><td colspan="2">لا توجد بيانات</td></tr>';
+
+        // جدول البرامج
+        let pHtml = "";
+        for(let p in programStats) {
+            pHtml += `<tr>
+                <td>${p}</td>
+                <td>${programStats[p].days.size} يوم</td>
+                <td><b>${programStats[p].totalLecs}</b> حصة</td>
+            </tr>`;
+        }
+        document.getElementById('programsStatsBody').innerHTML = pHtml || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
     }
 
-    function renderStats(students, totalDays, pDays, tDays, pStats) {
-        const over50 = students.filter(s => (s.days.size / (totalDays || 1)) >= 0.5).length;
-        let html = `
-            <h3><i class="fas fa-chart-line"></i> نتائج الفترة المحددة</h3>
-            <div class="stat-line"><span>إجمالي الأولاد الحاضرين:</span> <span class="stat-val">${students.length}</span></div>
-            <div class="stat-line"><span>إجمالي أيام العمل:</span> <span class="stat-val">${totalDays}</span></div>
-            <div class="stat-line" style="background:#e8f5e9"><span>تخطوا 50% حضور:</span> <span class="stat-val">${over50}</span></div>
-            <hr>
-            <p><b>أيام العمل لكل فترة:</b></p>
-            <div class="stat-line"><span>صباحي:</span> <span>${pDays["صباحي"].size} يوم</span></div>
-            <div class="stat-line"><span>مسائي:</span> <span>${pDays["مسائي"].size} يوم</span></div>
-            <hr>
-            <p><b>حضور المدرسين (أيام):</b></p>
-            ${Object.entries(tDays).map(([n, d]) => `<div class="stat-line"><span>${n}:</span> <span>${d.size} يوم</span></div>`).join('')}
-            <hr>
-            <p><b>محاضرات البرامج:</b></p>
-            ${Object.entries(pStats).map(([n, s]) => `<div class="stat-line"><span>${n}:</span> <span>${s.size} محاضرة</span></div>`).join('')}
-        `;
-        document.getElementById('statsRes').innerHTML = html;
+    function filterByShift(val, el) {
+        selectedShift = val;
+        document.querySelectorAll('[data-type="shift"]').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        processData();
     }
 
-    function setDateRange(type, el) {
+    function toggleSort(el) {
+        isSortingActive = !isSortingActive;
+        el.classList.toggle('active');
+        processData();
+    }
+
+    function quickDate(type, el) {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        const today = new Date().toISOString().split('T')[0];
-        if(type==='today') { document.getElementById('fDate').value = today; document.getElementById('tDate').value = today; }
-        else if(type==='month') { 
-            const first = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-            document.getElementById('fDate').value = first; document.getElementById('tDate').value = today;
-        } else { document.getElementById('fDate').value = ""; document.getElementById('tDate').value = ""; }
-        runAnalysis();
+        const now = new Date().toISOString().split('T')[0];
+        if(type === 'today') {
+            document.getElementById('dateStart').value = now;
+            document.getElementById('dateEnd').value = now;
+        } else if(type === 'month') {
+            document.getElementById('dateStart').value = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            document.getElementById('dateEnd').value = now;
+        } else {
+            document.getElementById('dateStart').value = ""; document.getElementById('dateEnd').value = "";
+        }
+        processData();
     }
 
-    async function send() {
-        const ids = document.getElementById('ids').value;
-        const teach = document.getElementById('teacher').value;
-        const progs = Array.from(document.querySelectorAll('.prog-item.selected')).map(i => i.getAttribute('data-v'));
-        if(!ids || progs.length===0 || !teach) return alert("اكمل البيانات");
-        alert("جاري الحفظ...");
-        for(let p of progs) { await fetch(`${SCRIPT_URL}?ids=${encodeURIComponent(ids)}&program=${encodeURIComponent(p)}&teacher=${encodeURIComponent(teach)}`, {mode:'no-cors'}); }
-        alert("تم!"); location.reload();
+    function openProfile(id) {
+        const s = finalProcessedData[id];
+        if(!s) return;
+        document.getElementById('modalName').innerText = s.name + " (" + s.id + ")";
+        document.getElementById('modalDays').innerText = s.days.size;
+        document.getElementById('modalLecs').innerText = s.lecs;
+        document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge">${p}</span>`).join('');
+        document.getElementById('profileModal').style.display = 'block';
     }
 
-    function searchTable() {
-        const val = document.getElementById('sInput').value.toLowerCase();
-        document.querySelectorAll('#tBody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
+    function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
+
+    function filterSearch() {
+        const val = document.getElementById('tableSearch').value.toLowerCase();
+        document.querySelectorAll('#reportTableBody tr').forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+        });
     }
 </script>
 </body>
 </html>
-
