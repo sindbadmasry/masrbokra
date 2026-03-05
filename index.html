@@ -75,9 +75,20 @@
         .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 25px; text-align: center; position: relative; animation: slideUp 0.3s; }
         .close-modal { position: absolute; left: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
         
-        .profile-img-container { width: 120px; height: 120px; margin: 0 auto 15px; position: relative; }
-        .profile-img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; background: #eee; }
-        
+              .profile-img-container {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    overflow: hidden; /* لضمان بقاء الصورة داخل الدائرة */
+    border: 3px solid var(--primary);
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* لضمان عدم تمطيط الصورة */
+}        
         .badge-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
         .badge { background: #f1f2f6; color: #57606f; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
 
@@ -520,16 +531,32 @@ function processData() {
         processData();
     }
 
-    function openProfile(id) {
-        const s = finalProcessedData[id];
-        if(!s) return;
-        document.getElementById('modalName').innerText = s.name + " (" + s.id + ")";
-        document.getElementById('modalDays').innerText = s.days.size;
-        document.getElementById('modalLecs').innerText = s.lecs;
-        document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge">${p}</span>`).join('');
-        document.getElementById('profileModal').style.display = 'block';
-    }
+   function openProfile(id) {
+    const s = finalProcessedData[id];
+    if(!s) return;
 
+    // تحديث اسم الطالب وكوده
+    document.getElementById('modalName').innerText = s.name + " (" + s.id + ")";
+    document.getElementById('modalDays').innerText = s.days.size;
+    document.getElementById('modalLecs').innerText = s.lecs;
+    
+    // --- الجزء الخاص بالصورة ---
+    // قم بتغيير الرابط أدناه لرابط مجلد صورك الحقيقي
+    // سنفترض أن الصور بصيغة .jpg واسم الصورة هو رقم الكود
+    const studentImgUrl = `https://your-domain.com/photos/${id}.jpg`; 
+    
+    const modalImg = document.getElementById('modalImg');
+    modalImg.src = studentImgUrl;
+
+    // في حال عدم وجود صورة لهذا الطالب، نضع صورة افتراضية
+    modalImg.onerror = function() {
+        this.src = "https://via.placeholder.com/150?text=No+Photo";
+    };
+    // -------------------------
+
+    document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge">${p}</span>`).join('');
+    document.getElementById('profileModal').style.display = 'block';
+}
     function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
 
     function filterSearch() {
@@ -541,6 +568,7 @@ function processData() {
 </script>
 </body>
 </html>
+
 
 
 
