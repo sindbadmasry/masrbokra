@@ -39,9 +39,37 @@
 
         .multi-select-container { position: relative; margin-bottom: 15px; }
         .select-box { padding: 12px; border: 1.5px solid #eee; border-radius: 12px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .dropdown-content { display: none; position: absolute; width: 100%; background: white; border: 1px solid #eee; border-radius: 12px; z-index: 10; max-height: 200px; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .dropdown-content.show { display: block; }
-        .dropdown-item { padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
+               .dropdown-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            z-index: 10;
+
+            /* الارتفاع المناسب لـ 3 أسماء تقريباً */
+            max-height: 125px;
+
+            overflow-y: auto;
+            /* تفعيل التمرير العمودي */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        /* تصغير حجم كل عنصر داخل القائمة قليلاً ليناسب الارتفاع الجديد */
+        .dropdown-item {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f9f9f9;
+        }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
         .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 25px; text-align: center; position: relative; animation: slideUp 0.3s; }
@@ -513,5 +541,6 @@ function processData() {
 </script>
 </body>
 </html>
+
 
 
