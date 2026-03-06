@@ -907,22 +907,30 @@ const absenceDays = Math.max(0, expectedDays - workedDays - annualLeavesTaken);
 
         function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
 
+                // دالة البحث في الجدول
         function filterSearch() {
             const val = document.getElementById('tableSearch').value.toLowerCase();
-            document.querySelectorAll('#reportTableBody tr').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(val) ? '' : 'none';
             });
         }
-            if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  navigator.serviceWorker.register("sw.js")
-  .then(() => console.log("Service Worker Registered"))
-  .catch(err => console.warn("SW failed:", err));
-}
-    </script>
 
+        // تسجيل الـ Service Worker بطريقة صحيحة ومنظمة
+        // هذا الجزء يجب أن يكون داخل وسم script وقبل نهايته
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js")
+                    .then(reg => console.log("Service Worker Registered ✅"))
+                    .catch(err => console.warn("Service Worker Failed ❌", err));
+            });
+        }
+    </script> <!-- تأكد أن هذا هو وسم الإغلاق الوحيد في النهاية -->
 </body>
-
 </html>
+
 
 
 
