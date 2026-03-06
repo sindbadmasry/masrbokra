@@ -858,15 +858,17 @@
 
         // دالة فتح بروفايل المدرس الجديدة
         function openTeacherProfile(tName) {
-            const workedDays = teacherStats[tName] ? teacherStats[tName].size : 0;
-            const totalCenterDays = centerWorkDays.size;
+          const workedDays = teacherStats[tName] ? teacherStats[tName].size : 0;
+const totalCenterDays = centerWorkDays.size;
 
             // حساب الإجازات (أيام الـ 13579)
-            const annualLeavesTaken = teacherLeaves[tName] ? teacherLeaves[tName].size : 0;
+        const annualLeavesTaken = teacherLeaves[tName] ? teacherLeaves[tName].size : 0;
 
-            // حساب الغياب
-            const absenceDays = Math.max(0, (totalCenterDays - 1) - workedDays - annualLeavesTaken);
+  // الأيام المتوقعة لعمل المدرس
+const expectedDays = Math.floor(totalCenterDays * 0.75);
 
+// حساب الغياب
+const absenceDays = Math.max(0, expectedDays - workedDays - annualLeavesTaken);
             const remainingLeave = 21 - annualLeavesTaken;
 
             document.getElementById('modalName').innerText = "المدرس: " + tName;
@@ -910,6 +912,7 @@
 </body>
 
 </html>
+
 
 
 
