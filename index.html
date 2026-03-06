@@ -913,15 +913,17 @@ const absenceDays = Math.max(0, expectedDays - workedDays - annualLeavesTaken);
                 row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
             });
         }
-            if ("serviceWorker" in navigator) {
+            if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   navigator.serviceWorker.register("sw.js")
-  .then(() => console.log("Service Worker Registered"));
-            }
+  .then(() => console.log("Service Worker Registered"))
+  .catch(err => console.warn("SW failed:", err));
+}
     </script>
 
 </body>
 
 </html>
+
 
 
 
