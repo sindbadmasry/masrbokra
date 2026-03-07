@@ -1,56 +1,63 @@
-// في كل مرة تقوم بتعديل الموقع، قم بتغيير هذا الرقم (مثلاً v2, v3, وهكذا) 
-// هذا التغيير هو ما يخبر المتصفح أن هناك تحديثاً جديداً!
-const CACHE_NAME = 'masrbokra-v2'; 
+// اسم الكاش - قم بتغيير الرقم (v1, v2...) عند تحديث الموقع ليحس المستخدم بالتغيير فوراً
+const CACHE_NAME = 'masrbokra-cache-v1';
 
+// الملفات التي سيتم حفظها للعمل بدون إنترنت
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './icon-192x192.png',
+  './icon-512x512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// 1. تثبيت الملفات
-self.addEventListener('install', event => {
+// 1. مرحلة التثبيت: حفظ الملفات الأساسية في الكاش
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('جاري حفظ ملفات النظام في الكاش...');
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
 });
 
-// 2. تفعيل وتنظيف الكاش القديم
-self.addEventListener('activate', event => {
+// 2. مرحلة التفعيل: حذف الكاش القديم عند تحديث الإصدار
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('جاري حذف الكاش القديم:', cache);
+            return caches.delete(cache);
+          }
+        })
       );
     })
   );
-  // تأكيد أن الـ Service Worker الجديد يمسك زمام الأمور فوراً
-  self.clients.claim(); 
+  // السيطرة على الصفحة فوراً
+  self.clients.claim();
 });
 
-// 3. الاستماع لأمر التحديث الفوري القادم من ملف HTML
-self.addEventListener('message', event => {
+// 3. الاستجابة لأمر التحديث الفوري (SKIP_WAITING)
+self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
 
-// 4. استراتيجية جلب البيانات (Network First للملفات الأساسية)
-self.addEventListener('fetch', event => {
-  const requestUrl = new URL(event.request.url);
-
-  // استثناء روابط جوجل شيت (تأتي من الإنترنت دائماً ولا تحفظ بالكاش)
-  if (requestUrl.hostname.includes('google.com') || requestUrl.hostname.includes('googleusercontent.com')) {
-    event.respondWith(fetch(event.request));
-    return;
+// 4. استراتيجية جلب البيانات (Network First مع Fallback to Cache)
+self.addEventListener('fetch', (event) => {
+  // استثناء روابط جوجل شيت حتى لا يتم تخزين بيانات قديمة (نحتاج دائماً أحدث حضور)
+  if (event.request.url.includes('google.com') || event.request.url.includes('googleusercontent.com')) {
+    return; // دع المتصفح يتعامل معها عبر الإنترنت فقط
   }
 
-  // لباقي الملفات: حاول جلبها من الإنترنت أولاً (لضمان أحدث نسخة)، 
-  // وإذا كان الإنترنت مفصولاً، استخدم الكاش
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request)
+      .catch(() => {
+        // إذا فشل الإنترنت، ابحث عن الملف في الكاش
+        return caches.match(event.request);
+      })
   );
 });
