@@ -565,8 +565,8 @@
         document.getElementById('modalLecsLabel').innerText = "إجمالي الحصص";
         
         const modalImg = document.getElementById('modalImg');
-        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
-        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+        modalImg.src = `https://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
+        modalImg.onerror = function() { this.src = "https://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
 
         document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge" style="background:#f1f2f6; color:#555; border:none;">${p}</span>`).join('');
         document.getElementById('profileModal').style.display = 'block';
@@ -582,8 +582,8 @@
 
         document.getElementById('modalName').innerText = "المدرس: " + tName;
         const modalImg = document.getElementById('modalImg');
-        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
-        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+        modalImg.src = `https://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
+        modalImg.onerror = function() { this.src = "https://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
 
         document.getElementById('modalDays').innerText = workedDays;
         document.getElementById('modalLecs').innerText = absenceDays;
