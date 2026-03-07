@@ -1,7 +1,7 @@
 {
   "name": "مصر بكرة للتنمية",
   "short_name": "مصر بكرة",
-  "description": "تطبيق تسجيل الحضور والغياب لمركز مصر بكرة",
+  "description": "تطبيق تسجيل الحضور والغياب لجمعية مصر بكرة",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f7f9",
