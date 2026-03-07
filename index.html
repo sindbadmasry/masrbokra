@@ -873,7 +873,7 @@ const totalCenterDays = centerWorkDays.size;
 const expectedDays = Math.floor(totalCenterDays * 0.75);
 
 // حساب الغياب
-const absenceDays = Math.max(0, expectedDays - workedDays - annualLeavesTaken);
+const absenceDays = Math.max(0, expectedDays - workedDays);
             const remainingLeave = 21 - annualLeavesTaken;
 
             document.getElementById('modalName').innerText = "المدرس: " + tName;
@@ -930,6 +930,7 @@ const absenceDays = Math.max(0, expectedDays - workedDays - annualLeavesTaken);
     </script> <!-- تأكد أن هذا هو وسم الإغلاق الوحيد في النهاية -->
 </body>
 </html>
+
 
 
 
