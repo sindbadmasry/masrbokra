@@ -598,18 +598,41 @@
     }
 
     function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
-    // تسجيل الـ Service Worker
+   <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(registration => {
-                    console.log('تم تشغيل ServiceWorker بنجاح', registration.scope);
-                })
-                .catch(error => {
-                    console.log('فشل تشغيل ServiceWorker', error);
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('تم تسجيل ServiceWorker بنجاح');
+                
+                // إجبار المتصفح على التحقق من وجود تحديثات في الخلفية
+                reg.update();
+
+                // مراقبة إذا تم العثور على تحديث جديد
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        // إذا تم تثبيت التحديث الجديد وهناك نسخة قديمة تعمل بالفعل
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('تم العثور على تحديث جديد! جاري التحديث...');
+                            // إرسال أمر للـ Service Worker الجديد ليعمل فوراً
+                            newWorker.postMessage({ action: 'SKIP_WAITING' });
+                        }
+                    });
                 });
+            });
+
+            // عمل ريفريش تلقائي للصفحة بمجرد أن يستلم الـ Service Worker الجديد العمل
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
         });
     }
 </script>
+</script>
 </body>
 </html>
+
