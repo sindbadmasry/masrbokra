@@ -2,12 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4834d4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مصر بكرة">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مصر بكرة للتنمية</title>
-    <link rel="stylesheet" href="https:s://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
-            --primary: #4834d4; --secondarhy: #686de0; --success: #27ae60; 
+            --primary: #4834d4; --secondary: #686de0; --success: #27ae60; 
             --bg: #f4f7f9; --white: #ffffff; --text: #2d3436;
         }
 
@@ -247,7 +253,7 @@
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <div class="profile-img-container">
-            <img id="modalImg" src="https:s://via.placeholder.com/150" class="profile-img">
+            <img id="modalImg" src="https://via.placeholder.com/150" class="profile-img">
         </div>
         <h2 id="modalName" style="margin: 0; color: var(--primary);">الاسم</h2>
         <div style="background: #f8f9fa; border-radius: 15px; padding: 15px; margin: 15px 0; display: flex; justify-content: space-around;">
@@ -271,9 +277,9 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT = "https:s://script.google.com/macros/s/AKfycbz4xugO-5lish7nbQAiizHDAEzUDsrx_RAEdKCGi-26iYI3mO1C0x8pQVlYIsN8HDW9/exec";
-    const ATTENDANCE_CSV = "https:s://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
-    const STUDENTS_CSV = "https:s://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=0&single=true&output=csv";
+    const GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbz4xugO-5lish7nbQAiizHDAEzUDsrx_RAEdKCGi-26iYI3mO1C0x8pQVlYIsN8HDW9/exec";
+    const ATTENDANCE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
+    const STUDENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=0&single=true&output=csv";
 
     let rawAttendance = [];
     let studentsShiftData = {}; 
@@ -559,8 +565,8 @@
         document.getElementById('modalLecsLabel').innerText = "إجمالي الحصص";
         
         const modalImg = document.getElementById('modalImg');
-        modalImg.src = `https:://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
-        modalImg.onerror = function() { this.src = "https:://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
+        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
 
         document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge" style="background:#f1f2f6; color:#555; border:none;">${p}</span>`).join('');
         document.getElementById('profileModal').style.display = 'block';
@@ -576,8 +582,8 @@
 
         document.getElementById('modalName').innerText = "المدرس: " + tName;
         const modalImg = document.getElementById('modalImg');
-        modalImg.src = `https:://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
-        modalImg.onerror = function() { this.src = "https:://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
+        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
 
         document.getElementById('modalDays').innerText = workedDays;
         document.getElementById('modalLecs').innerText = absenceDays;
@@ -592,7 +598,18 @@
     }
 
     function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
+    // تسجيل الـ Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('تم تشغيل ServiceWorker بنجاح', registration.scope);
+                })
+                .catch(error => {
+                    console.log('فشل تشغيل ServiceWorker', error);
+                });
+        });
+    }
 </script>
 </body>
 </html>
-
