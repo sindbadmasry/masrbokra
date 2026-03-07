@@ -1,45 +1,615 @@
-const CACHE_NAME = 'masrbokra-v1';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
-];
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4834d4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مصر بكرة">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصر بكرة للتنمية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #4834d4; --secondary: #686de0; --success: #27ae60; 
+            --bg: #f4f7f9; --white: #ffffff; --text: #2d3436;
+        }
 
-// تثبيت ملفات الكاش الأساسية
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS_TO_CACHE))
-  );
-  self.skipWaiting();
-});
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; color: var(--text); overflow-x: hidden; }
+        .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px 15px; }
 
-// تفعيل وتنظيف الكاش القديم
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
-      );
-    })
-  );
-});
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-// استراتيجية جلب البيانات: 
-// للصفحة نستخدم الكاش، ولبيانات جوجل شيت نستخدم الإنترنت دائماً
-self.addEventListener('fetch', event => {
-  const requestUrl = new URL(event.request.url);
+        .card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
+        h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
 
-  // لا تقم بعمل كاش لروابط جوجل شيت وسكريبت جوجل عشان البيانات تتحدث دايماً
-  if (requestUrl.hostname.includes('google.com') || requestUrl.hostname.includes('googleusercontent.com')) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
+        /* الكروت الإحصائية العلوية */
+        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .summary-card { background: white; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .summary-card .val { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .summary-card .lbl { font-size: 0.75rem; color: #777; margin-top: 5px; font-weight: bold; }
 
-  // لباقي الملفات (HTML, CSS) استخدم Network First ثم الكاش
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
-  );
-});
+        /* التبويبات */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: white; border-radius: 12px; font-weight: bold; cursor: pointer; color: #555; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); font-size: 0.85rem; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        .filter-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
+        .chips-group { margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+        .chips-label { font-size: 0.75rem; color: #888; margin-bottom: 5px; display: block; }
+        .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { background: #eee; padding: 6px 15px; border-radius: 25px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .chip.active { background: var(--primary); color: white; }
+        
+        .date-inputs { display: flex; gap: 10px; align-items: center; font-size: 0.85rem; margin-top: 10px; }
+        .date-inputs input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
+
+        .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 7px 0; }
+        .prog-item { background: #f9f9f9; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .prog-item i { display: block; font-size: 1.3rem; margin-bottom: 5px; }
+        .prog-item span { font-size: 0.75rem; font-weight: bold; }
+        .prog-item.selected { border-color: var(--primary); background: #eeebff; transform: scale(0.95); }
+
+        .multi-select-container { position: relative; margin-bottom: 15px; margin-top: 15px;}
+        .select-box { padding: 12px; border: 1.5px solid #eee; border-radius: 12px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* تعديل القائمة المنسدلة للمدرسين لكي لا تغطي زر التسجيل */
+        .dropdown-content {
+            display: none;
+            width: 100%;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+        .dropdown-content.show { display: block; }
+        .dropdown-item { padding: 8px 10px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 25px; text-align: center; position: relative; animation: slideUp 0.3s; }
+        .close-modal { position: absolute; left: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
+        
+        .profile-img-container { width: 100px; height: 100px; margin: 0 auto 15px; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); }
+        .profile-img { width: 100%; height: 100%; object-fit: cover; }        
+        
+        .badge-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+        .badge { background: #e3fcef; color: #27ae60; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; border: 1px solid #bdf2d5; }
+
+        .student-link, .teacher-link { color: var(--primary); font-weight: bold; text-decoration: underline; cursor: pointer; }
+        
+        .table-res { overflow-x: auto; border-radius: 12px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.85rem; }
+        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; white-space: nowrap; }
+        td { padding: 12px; border-bottom: 1px solid #f1f1f1; text-align: center; }
+
+        .btn-sync { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; cursor: pointer; font-size: 0.85rem; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 3px; }
+
+        .search-input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; outline: none; }
+        
+        /* بوب أب النجاح */
+        .success-popup {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: white; padding: 30px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 3000;
+            text-align: center; width: 250px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .success-popup.show { display: block; transform: translate(-50%, -50%) scale(1); }
+        .success-popup i { font-size: 50px; color: #27ae60; margin-bottom: 15px; display: block; }
+        .success-popup h2 { color: var(--primary); font-size: 1.2rem; margin: 10px 0; }
+        .overlay-blur {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); z-index: 2999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="filterSection" class="filter-box" style="display:none;">
+        <div class="chips-group">
+            <span class="chips-label">الوقت:</span>
+            <div class="chips">
+                <div class="chip" onclick="quickDate('today', this)">اليوم</div>
+                <div class="chip" onclick="quickDate('month', this)">هذا الشهر</div>
+                <div class="chip active" onclick="quickDate('all', this)">كل الأوقات</div>
+            </div>
+        </div>
+
+        <div class="chips-group">
+            <span class="chips-label">الفترة :</span>
+            <div class="chips">
+                <div class="chip active" data-type="shift" onclick="filterByShift('all', this)">الكل</div>
+                <div class="chip" data-type="shift" onclick="filterByShift('صباحي', this)">صباحي</div>
+                <div class="chip" data-type="shift" onclick="filterByShift('مسائي', this)">مسائي</div>
+                <div id="topSort" class="chip" style="background:#fff2e6; border:1px solid #ffd8b3;" onclick="toggleSort(this)">🏆 الأكثر حضوراً</div>
+            </div>
+        </div>
+
+        <div class="date-inputs">
+            <span>من:</span> <input type="date" id="dateStart" onchange="processData()">
+            <span>إلى:</span> <input type="date" id="dateEnd" onchange="processData()">
+        </div>
+    </div>
+
+    <div id="pageEntry" class="page active">
+        <div class="card">
+            <h3><i class="fas fa-plus-circle"></i> تسجيل حضور الطلاب</h3>
+            <textarea id="inputIds" rows="3" style="width: 100%; padding:10px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;" placeholder="أدخل أرقام الطلاب مسافات أو أسطر..."></textarea>
+            
+            <div class="prog-grid">
+                <div class="prog-item" data-v="تعليم" onclick="toggleProg(this)"><i class="fas fa-graduation-cap" style="color:#27ae60"></i><span>تعليم</span></div>
+                <div class="prog-item" data-v="صحة" onclick="toggleProg(this)"><i class="fas fa-heartbeat" style="color:#e74c3c"></i><span>صحة</span></div>
+                <div class="prog-item" data-v="كمبيوتر" onclick="toggleProg(this)"><i class="fas fa-desktop" style="color:#3498db"></i><span>كمبيوتر</span></div>
+                <div class="prog-item" data-v="رياضة" onclick="toggleProg(this)"><i class="fas fa-volleyball-ball" style="color:#f1c40f"></i><span>رياضة</span></div>
+                <div class="prog-item" data-v="تدريب" onclick="toggleProg(this)"><i class="fas fa-dumbbell" style="color:#2d3436"></i><span>تدريب</span></div>
+                <div class="prog-item" data-v="بروك" onclick="toggleProg(this)"><i class="fas fa-tree" style="color:#e67e22"></i><span>بروك</span></div>
+                <div class="prog-item" data-v="حفلة" onclick="toggleProg(this)"><i class="fas fa-birthday-cake" style="color:#fd79a8"></i><span>حفلة</span></div>
+                <div class="prog-item" data-v="رحلة" onclick="toggleProg(this)"><i class="fas fa-bus" style="color:#1abc9c"></i><span>رحلة</span></div>
+                <div class="prog-item" data-v="فن" onclick="toggleProg(this)"><i class="fas fa-palette" style="color:#9b59b6"></i><span>فن</span></div>
+                <div class="prog-item" data-v="نشاط" onclick="toggleProg(this)"><i class="fas fa-running" style="color:#ff9f43"></i><span>نشاط</span></div>
+                <div class="prog-item" data-v="معسكر" onclick="toggleProg(this)"><i class="fas fa-campground" style="color:#0abde3"></i><span>معسكر</span></div>
+            </div>
+
+            <input type="text" id="progDetails" class="search-input" style="margin-top: 5px; margin-bottom: 5px;" placeholder="تفاصيل إضافية للبرنامج (اختياري)...">
+
+            <div class="multi-select-container">
+                <div class="select-box" onclick="toggleTeachers()">
+                    <span id="teacherPlaceholder">-- اختر المدرسين --</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="teachersDropdown" class="dropdown-content">
+                    <label class="dropdown-item"><input type="checkbox" value="mohamed"> mohamed</label>
+                    <label class="dropdown-item"><input type="checkbox" value="karim"> karim</label>
+                    <label class="dropdown-item"><input type="checkbox" value="mostafa"> mostafa</label>
+                    <label class="dropdown-item"><input type="checkbox" value="osama"> osama</label>
+                    <label class="dropdown-item"><input type="checkbox" value="said"> said</label>
+                    <label class="dropdown-item"><input type="checkbox" value="islam"> islam</label>
+                    <label class="dropdown-item"><input type="checkbox" value="sohaila"> sohaila</label>
+                    <label class="dropdown-item"><input type="checkbox" value="dawlat"> dawlat</label>
+                    <label class="dropdown-item"><input type="checkbox" value="alaa"> alaa</label>
+                </div>
+            </div>
+
+            <button class="btn-sync" style="background:var(--primary)" onclick="submitAttendance()">تسجيل الحضور</button>
+        </div>
+    </div>
+
+    <div id="pageReports" class="page">
+        <button class="btn-sync" onclick="fetchAndSync()">تحديث البيانات <i class="fas fa-sync"></i></button>
+        
+        <div class="summary-cards" id="topSummaryCards">
+            </div>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('tab-students', this)">كشف الطلاب</button>
+            <button class="tab-btn" onclick="switchTab('tab-teachers', this)">كشف المدرسين</button>
+            <button class="tab-btn" onclick="switchTab('tab-programs', this)">كشف البرامج</button>
+        </div>
+
+        <div id="tab-students" class="tab-content active card">
+            <input type="text" id="studentSearch" class="search-input" onkeyup="filterSearchTable(this, 'reportTableBody')" placeholder="بحث بالكود أو اسم الطالب...">
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>الاسم</th><th>أيام الحضور</th><th>عدد الحصص</th></tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-teachers" class="tab-content card">
+            <input type="text" id="teacherSearch" class="search-input" onkeyup="filterSearchTable(this, 'teachersStatsBody')" placeholder="بحث باسم المدرس...">
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>إسم المدرس</th>
+                            <th>أيام العمل</th>
+                            <th>تفصيل البرامج (الأيام)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersStatsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-programs" class="tab-content card">
+            <div class="table-res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>البرنامج</th>
+                            <th>أيام العمل</th>
+                            <th>إجمالي الحصص</th>
+                        </tr>
+                    </thead>
+                    <tbody id="programsStatsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="profile-img-container">
+            <img id="modalImg" src="https://via.placeholder.com/150" class="profile-img">
+        </div>
+        <h2 id="modalName" style="margin: 0; color: var(--primary);">الاسم</h2>
+        <div style="background: #f8f9fa; border-radius: 15px; padding: 15px; margin: 15px 0; display: flex; justify-content: space-around;">
+             <div><small id="modalDaysLabel">أيام الحضور</small><br><strong id="modalDays">0</strong></div>
+            <div><small id="modalLecsLabel">إجمالي الحصص</small><br><strong id="modalLecs">0</strong></div>
+        </div>
+        <div class="badge-list" id="modalProgList"></div>
+    </div>
+</div>
+
+<nav class="nav">
+    <div class="nav-item active" onclick="navigate('pageEntry', this)"><i class="fas fa-plus-circle"></i><span>تسجيل</span></div>
+    <div class="nav-item" onclick="navigate('pageReports', this)"><i class="fas fa-chart-pie"></i><span>التقارير والإحصائيات</span></div>
+</nav>
+
+<div id="overlayBlur" class="overlay-blur"></div>
+<div id="successPopup" class="success-popup">
+    <i class="fas fa-check-circle"></i>
+    <h2>الله ينور يا عسلية</h2>
+    <p style="font-size: 0.8rem; color: #666;">تم تسجيل الحضور بنجاح ✅</p>
+</div>
+
+<script>
+    const GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbz4xugO-5lish7nbQAiizHDAEzUDsrx_RAEdKCGi-26iYI3mO1C0x8pQVlYIsN8HDW9/exec";
+    const ATTENDANCE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
+    const STUDENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=0&single=true&output=csv";
+
+    let rawAttendance = [];
+    let studentsShiftData = {}; 
+    let finalProcessedData = {};
+    let teacherStats = {}; 
+    let programStats = {};
+    let centerWorkDays = new Set();
+    let teacherLeaves = {};
+    let selectedShift = 'all';
+    let isSortingActive = false;
+
+    // التنقل بين الصفحات الرئيسية
+    function navigate(pageId, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('filterSection').style.display = (pageId === 'pageEntry') ? 'none' : 'block';
+    }
+
+    // التنقل بين التبويبات الداخلية في صفحة التقارير
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function toggleProg(el) { el.classList.toggle('selected'); }
+    function toggleTeachers() { document.getElementById('teachersDropdown').classList.toggle('show'); }
+
+    function showSuccessMessage() {
+        const popup = document.getElementById('successPopup');
+        const blur = document.getElementById('overlayBlur');
+        popup.classList.add('show');
+        blur.style.display = 'block';
+        setTimeout(() => {
+            popup.classList.remove('show');
+            blur.style.display = 'none';
+        }, 2000);
+    }
+
+    async function submitAttendance() {
+        let idsInput = document.getElementById('inputIds').value.trim();
+        const teachers = Array.from(document.querySelectorAll('#teachersDropdown input:checked')).map(i => i.value).join(' & ');
+        
+        // جلب البرامج الأساسية
+        let progs = Array.from(document.querySelectorAll('.prog-item.selected')).map(i => i.dataset.v).join(' & ');
+        
+        // إضافة التفاصيل إذا وجدت
+        const extraDetails = document.getElementById('progDetails').value.trim();
+        if(extraDetails) {
+            if(progs) progs += ` - ${extraDetails}`;
+            else progs = extraDetails;
+        }
+
+        if(idsInput !== "13579" && (!idsInput || !teachers || !progs)) return alert("برجاء إدخال الأكواد واختيار المدرس والبرنامج");
+        if(idsInput === "13579" && !teachers) return alert("برجاء اختيار المدرس لتسجيل إجازته");
+
+        let idsProcessed = idsInput.split(/[\s\n,]+/).filter(i => i.length > 0).join(' . ');
+        const url = `${GOOGLE_SCRIPT}?ids=${encodeURIComponent(idsProcessed)}&program=${encodeURIComponent(progs)}&teacher=${encodeURIComponent(teachers)}`;
+        
+        try {
+            const img = new Image();
+            img.src = url;
+            showSuccessMessage();
+            document.getElementById('inputIds').value = "";
+            document.getElementById('progDetails').value = "";
+            document.querySelectorAll('.prog-item').forEach(p => p.classList.remove('selected'));
+            document.querySelectorAll('#teachersDropdown input').forEach(i => i.checked = false);
+            document.getElementById('teachersDropdown').classList.remove('show');
+        } catch (e) { alert("حدث خطأ في الاتصال"); }
+    }
+
+    async function fetchAndSync() {
+        const btn = document.querySelector('.btn-sync');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+        try {
+            const resStu = await fetch(STUDENTS_CSV);
+            const textStu = await resStu.text();
+            const rowsStu = textStu.split('\n').map(r => r.split(','));
+            studentsShiftData = {};
+            rowsStu.slice(1).forEach(r => {
+                const id = r[0]?.trim();
+                const name = r[1]?.trim();
+                const shift = r[2]?.trim();
+                if(id) studentsShiftData[id] = { name, shift };
+            });
+
+            const resAtt = await fetch(ATTENDANCE_CSV);
+            const textAtt = await resAtt.text();
+            rawAttendance = textAtt.split('\n').map(r => r.split(',')).slice(1);
+            
+            processData();
+        } catch(e) { 
+            console.error(e);
+            alert("فشل جلب البيانات. تأكد من اتصالك بالإنترنت ونشر الشيت."); 
+        }
+        btn.innerHTML = 'تحديث البيانات <i class="fas fa-sync"></i>';
+    }
+
+    function processData() {
+        const start = document.getElementById('dateStart').value;
+        const end = document.getElementById('dateEnd').value;
+        
+        finalProcessedData = {};
+        teacherStats = {};
+        programStats = {};
+        centerWorkDays = new Set();
+        teacherLeaves = {};
+
+        rawAttendance.forEach(row => {
+            if(row.length < 6) return;
+            
+            let idsRaw = row[1] ? row[1].replace(/"/g, '').trim() : "";
+            let date = row[3] ? row[3].trim() : "";
+            let progsRaw = row[5] ? row[5].replace(/"/g, '').trim() : "";
+            let teacherRaw = row[6] ? row[6].replace(/"/g, '').trim() : "";
+
+            if(!idsRaw || !date) return;
+            if(start && date < start) return;
+            if(end && date > end) return;
+
+            centerWorkDays.add(date);
+
+            const idList = idsRaw.split(/[^\d]+/).filter(i => i.length > 0);
+            const progList = progsRaw ? progsRaw.split('&').map(p => p.trim()) : [];
+            const teacherList = teacherRaw ? teacherRaw.split('&').map(t => t.trim()) : [];
+
+            if (idList.includes("13579")) {
+                teacherList.forEach(t => {
+                    if(t && t !== "") {
+                        if(!teacherLeaves[t]) teacherLeaves[t] = new Set();
+                        teacherLeaves[t].add(date);
+                    }
+                });
+                return; 
+            }
+
+            idList.forEach(id => {
+                if (!studentsShiftData[id]) return; 
+
+                const sInfo = studentsShiftData[id];
+                if(selectedShift !== 'all' && sInfo.shift !== selectedShift) return;
+
+                if(!finalProcessedData[id]) {
+                    finalProcessedData[id] = { id, name: sInfo.name, days: new Set(), lecs: 0, progs: new Set() };
+                }
+                finalProcessedData[id].days.add(date);
+                finalProcessedData[id].lecs += progList.length;
+                progList.forEach(p => finalProcessedData[id].progs.add(p));
+            });
+
+            // إحصائيات المدرسين: تسجيل الأيام وأنواع البرامج
+            teacherList.forEach(t => {
+                if(t && t !== "") {
+                    // هيكل جديد للمدرس يحمل الأيام والبرامج الخاصة به
+                    if(!teacherStats[t]) teacherStats[t] = { days: new Set(), progs: {} };
+                    teacherStats[t].days.add(date);
+                    
+                    progList.forEach(p => {
+                        if(p && p !== "") {
+                            if(!teacherStats[t].progs[p]) teacherStats[t].progs[p] = new Set();
+                            teacherStats[t].progs[p].add(date);
+                        }
+                    });
+                }
+            });
+
+            // إحصائيات البرامج العامة
+            progList.forEach(p => {
+                if(p && p !== "") {
+                    if(!programStats[p]) programStats[p] = { days: new Set(), totalLecs: 0 };
+                    programStats[p].days.add(date);
+                    programStats[p].totalLecs++;
+                }
+            });
+        });
+
+        renderReports();
+    }
+
+    function renderReports() {
+        // 1. الكروت الإحصائية الثلاثة (الجمعية العامة)
+        const totalStudents = Object.keys(finalProcessedData).length;
+        const totalDays = centerWorkDays.size;
+        let totalClasses = 0;
+        for(let p in programStats) totalClasses += programStats[p].totalLecs;
+
+        document.getElementById('topSummaryCards').innerHTML = `
+            <div class="summary-card"><div class="val">${totalStudents}</div><div class="lbl">إجمالي الطلاب</div></div>
+            <div class="summary-card"><div class="val">${totalDays}</div><div class="lbl">أيام العمل الكلية</div></div>
+            <div class="summary-card"><div class="val">${totalClasses}</div><div class="lbl">الحصص المنفذة</div></div>
+        `;
+
+        // 2. كشف الطلاب
+        let sItems = Object.values(finalProcessedData);
+        if(isSortingActive) sItems.sort((a, b) => b.days.size - a.days.size);
+        const sHtml = sItems.map(s => `
+            <tr>
+                <td><span class="student-link" onclick="openProfile('${s.id}')">${s.id}</span></td>
+                <td>${s.name || '---'}</td>
+                <td><b>${s.days.size}</b> يوم</td>
+                <td>${s.lecs} حصص</td>
+            </tr>
+        `).join('');
+        document.getElementById('reportTableBody').innerHTML = sHtml || '<tr><td colspan="4">لا توجد بيانات</td></tr>';
+
+        // 3. كشف المدرسين (مع تفاصيل البرامج)
+        let tHtml = "";
+        for(let t in teacherStats) {
+            let data = teacherStats[t];
+            // تجهيز بادجات البرامج للمدرس
+            let progsBadges = Object.keys(data.progs).map(p => 
+                `<span class="badge">${p} (${data.progs[p].size})</span>`
+            ).join(' ');
+
+            tHtml += `<tr>
+                <td><span class="teacher-link" onclick="openTeacherProfile('${t}')">${t}</span></td>
+                <td><b>${data.days.size}</b> يوم</td>
+                <td style="line-height: 2;">${progsBadges || '---'}</td>
+            </tr>`;
+        }
+        document.getElementById('teachersStatsBody').innerHTML = tHtml || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+
+        // 4. كشف البرامج
+        let pHtml = "";
+        for(let p in programStats) {
+            pHtml += `<tr>
+                <td>${p}</td>
+                <td>${programStats[p].days.size} يوم</td>
+                <td><b>${programStats[p].totalLecs}</b> حصة</td>
+            </tr>`;
+        }
+        document.getElementById('programsStatsBody').innerHTML = pHtml || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+    }
+
+    // دالة البحث العامة للجداول
+    function filterSearchTable(inputEl, tbodyId) {
+        const val = inputEl.value.toLowerCase();
+        document.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+        });
+    }
+
+    function filterByShift(val, el) {
+        selectedShift = val;
+        document.querySelectorAll('[data-type="shift"]').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        processData();
+    }
+
+    function toggleSort(el) {
+        isSortingActive = !isSortingActive;
+        el.classList.toggle('active');
+        processData();
+    }
+
+    function quickDate(type, el) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        const now = new Date().toISOString().split('T')[0];
+        if(type === 'today') {
+            document.getElementById('dateStart').value = now;
+            document.getElementById('dateEnd').value = now;
+        } else if(type === 'month') {
+            document.getElementById('dateStart').value = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            document.getElementById('dateEnd').value = now;
+        } else {
+            document.getElementById('dateStart').value = ""; document.getElementById('dateEnd').value = "";
+        }
+        processData();
+    }
+
+    // فتح بروفايل الطالب
+    function openProfile(id) {
+        const s = finalProcessedData[id];
+        if(!s) return;
+        document.getElementById('modalName').innerText = s.name + " (" + s.id + ")";
+        document.getElementById('modalDays').innerText = s.days.size;
+        document.getElementById('modalLecs').innerText = s.lecs;
+        document.getElementById('modalDaysLabel').innerText = "أيام الحضور";
+        document.getElementById('modalLecsLabel').innerText = "إجمالي الحصص";
+        
+        const modalImg = document.getElementById('modalImg');
+        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
+        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+
+        document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge" style="background:#f1f2f6; color:#555; border:none;">${p}</span>`).join('');
+        document.getElementById('profileModal').style.display = 'block';
+    }
+
+    // فتح بروفايل المدرس
+    function openTeacherProfile(tName) {
+        const workedDays = teacherStats[tName] ? teacherStats[tName].days.size : 0;
+        const totalCenterDays = centerWorkDays.size;
+        const annualLeavesTaken = teacherLeaves[tName] ? teacherLeaves[tName].size : 0;
+        const absenceDays = Math.max(0, (totalCenterDays * 0.75) - workedDays - annualLeavesTaken);
+        const remainingLeave = 21 - annualLeavesTaken;
+
+        document.getElementById('modalName').innerText = "المدرس: " + tName;
+        const modalImg = document.getElementById('modalImg');
+        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
+        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+
+        document.getElementById('modalDays').innerText = workedDays;
+        document.getElementById('modalLecs').innerText = absenceDays;
+        document.getElementById('modalDaysLabel').innerText = "أيام العمل الفعلية";
+        document.getElementById('modalLecsLabel').innerText = "غياب (بدون عذر)";
+
+        document.getElementById('modalProgList').innerHTML = `
+            <div class="badge" style="background:#2ecc71; color:white; border:none;">المتبقي: ${remainingLeave} يوم</div>
+            <div class="badge" style="background:#e67e22; color:white; border:none;">إجازات بطلب : ${annualLeavesTaken}</div>
+        `;
+        document.getElementById('profileModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
+    // تسجيل الـ Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('تم تشغيل ServiceWorker بنجاح', registration.scope);
+                })
+                .catch(error => {
+                    console.log('فشل تشغيل ServiceWorker', error);
+                });
+        });
+    }
+</script>
+</body>
+</html>
