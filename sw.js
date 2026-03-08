@@ -1,5 +1,5 @@
 // اسم الكاش - قم بتغيير الرقم (v1, v2...) عند تحديث الموقع ليحس المستخدم بالتغيير فوراً
-const CACHE_NAME = 'masrbokra-cache-v1';
+const CACHE_NAME = 'masrbokra-cache-v1.2';
 
 // الملفات التي سيتم حفظها للعمل بدون إنترنت
 const ASSETS_TO_CACHE = [
