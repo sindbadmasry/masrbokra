@@ -580,7 +580,7 @@
         const workedDays = teacherStats[tName] ? teacherStats[tName].days.size : 0;
         const totalCenterDays = centerWorkDays.size;
         const annualLeavesTaken = teacherLeaves[tName] ? teacherLeaves[tName].size : 0;
-        const absenceDays = Math.max(0, (totalCenterDays * 0.75) - workedDays - annualLeavesTaken);
+        const absenceDays = Math.max(0, Math.floor((totalCenterDays * 0.75) - workedDays - annualLeavesTaken));
         const remainingLeave = 21 - annualLeavesTaken;
 
         document.getElementById('modalName').innerText = "المدرس: " + tName;
@@ -636,6 +636,7 @@
 </script>
 </body>
 </html>
+
 
 
 
