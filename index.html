@@ -1,607 +1,1496 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>جمعية مصر بكرة</title>
     <link rel="manifest" href="manifest.json">
-    
-    <meta name="theme-color" content="#4834d4">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
-    <title>مصر بكرة للتنمية</title>
+    <meta name="theme-color" content="#2563eb">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #4834d4; --secondary: #686de0; --success: #27ae60; 
-            --bg: #f4f7f9; --white: #ffffff; --text: #2d3436;
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0d9488;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ea580c;
+            --info: #0284c7;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 20px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
         }
 
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; color: var(--text); overflow-x: hidden; }
-        .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px 15px; }
-
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
-        h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-
-        /* الكروت الإحصائية العلوية */
-        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .summary-card { background: white; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .summary-card .val { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
-        .summary-card .lbl { font-size: 0.75rem; color: #777; margin-top: 5px; font-weight: bold; }
-
-        /* التبويبات */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: white; border-radius: 12px; font-weight: bold; cursor: pointer; color: #555; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); font-size: 0.85rem; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-
-        .filter-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e0e0e0; }
-        .chips-group { margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
-        .chips-label { font-size: 0.75rem; color: #888; margin-bottom: 5px; display: block; }
-        .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .chip { background: #eee; padding: 6px 15px; border-radius: 25px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .chip.active { background: var(--primary); color: white; }
-        
-        .date-inputs { display: flex; gap: 10px; align-items: center; font-size: 0.85rem; margin-top: 10px; }
-        .date-inputs input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
-
-        .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 7px 0; }
-        .prog-item { background: #f9f9f9; padding: 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-        .prog-item i { display: block; font-size: 1.3rem; margin-bottom: 5px; }
-        .prog-item span { font-size: 0.75rem; font-weight: bold; }
-        .prog-item.selected { border-color: var(--primary); background: #eeebff; transform: scale(0.95); }
-
-        .multi-select-container { position: relative; margin-bottom: 15px; margin-top: 15px;}
-        .select-box { padding: 12px; border: 1.5px solid #eee; border-radius: 12px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* تعديل القائمة المنسدلة للمدرسين لكي لا تغطي زر التسجيل */
-        .dropdown-content {
-            display: none;
-            width: 100%;
-            background: #fafafa;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 8px;
+        * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Tajawal', sans-serif;
         }
-        .dropdown-content.show { display: block; }
-        .dropdown-item { padding: 8px 10px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
 
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
-        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 25px; text-align: center; position: relative; animation: slideUp 0.3s; }
-        .close-modal { position: absolute; left: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #aaa; }
-        
-        .profile-img-container { width: 100px; height: 100px; margin: 0 auto 15px; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); }
-        .profile-img { width: 100%; height: 100%; object-fit: cover; }        
-        
-        .badge-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
-        .badge { background: #e3fcef; color: #27ae60; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; border: 1px solid #bdf2d5; }
-
-        .student-link, .teacher-link { color: var(--primary); font-weight: bold; text-decoration: underline; cursor: pointer; }
-        
-        .table-res { overflow-x: auto; border-radius: 12px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.85rem; }
-        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; white-space: nowrap; }
-        td { padding: 12px; border-bottom: 1px solid #f1f1f1; text-align: center; }
-
-        .btn-sync { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        
-        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; cursor: pointer; font-size: 0.85rem; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 3px; }
-
-        .search-input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; outline: none; }
-        
-        /* بوب أب النجاح */
-        .success-popup {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            background: white; padding: 30px; border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 3000;
-            text-align: center; width: 250px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        body {
+            background: var(--bg);
+            margin: 0;
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 80px;
         }
-        .success-popup.show { display: block; transform: translate(-50%, -50%) scale(1); }
-        .success-popup i { font-size: 50px; color: #27ae60; margin-bottom: 15px; display: block; }
-        .success-popup h2 { color: var(--primary); font-size: 1.2rem; margin: 10px 0; }
-        .overlay-blur {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); z-index: 2999;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), #1e3a8a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 400px;
+            padding: 40px 30px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-box h2 {
+            margin: 15px 0 5px;
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+
+        .login-box p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            outline: none;
+            transition: 0.3s;
+            font-size: 15px;
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info), #0284c7);
+            color: white;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-dark);
+        }
+
+        #app-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        header {
+            background: var(--card-bg);
+            color: var(--text-dark);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            border-radius: 25px 25px 0 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+
+        .container {
+            padding: 20px 15px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            padding: 12px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: inherit;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: 900;
+            display: block;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .stat-item .label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-header {
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            background: #f1f5f9;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: 0.3s;
+        }
+
+        .dropdown-header:hover {
+            border-color: var(--primary);
+        }
+
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            margin-bottom: 8px;
+            padding: 10px;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .dropdown-list.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .teacher-option {
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg);
+            transition: 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .teacher-option:hover {
+            background: #e2e8f0;
+        }
+
+        .teacher-option.selected {
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 800;
+            border: 1px solid var(--primary);
+        }
+
+        .multi-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .chip {
+            padding: 10px 18px;
+            border-radius: 20px;
+            background: var(--bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chip.selected {
+            background: #eff6ff;
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+        }
+
+        .sub-tabs {
+            display: flex;
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .sub-tab-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-muted);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .sub-tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-tools {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .quick-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .quick-filters .btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex: none;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 15px 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        tr:hover td {
+            background: #f1f5f9;
+            cursor: pointer;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .bg-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .bg-approved {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .bg-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 24px;
+            position: relative;
+            animation: scaleIn 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 35px;
+            height: 35px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding-right: 45px;
+            border-radius: 16px;
+            background: var(--bg);
+            border: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 18px;
+            top: 16px;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .student-modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .student-modal-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 12px;
+            background: var(--bg);
+        }
+
+        .student-modal-name {
+            font-size: 22px;
+            font-weight: 900;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .student-modal-code {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 14px;
+            background: #eff6ff;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 8px;
         }
     </style>
 </head>
+
 <body>
+    <div class="loader-overlay" id="global-loader">
+        <div class="spinner"></div>
+    </div>
 
-<div class="container">
-    
-    <div id="filterSection" class="filter-box" style="display:none;">
-        <div class="chips-group">
-            <span class="chips-label">الوقت:</span>
-            <div class="chips">
-                <div class="chip" onclick="quickDate('today', this)">اليوم</div>
-                <div class="chip" onclick="quickDate('month', this)">هذا الشهر</div>
-                <div class="chip active" onclick="quickDate('all', this)">كل الأوقات</div>
+    <div id="login-screen">
+        <div class="login-box">
+            <i class="fas fa-seedling fa-4x" style="color: var(--primary); margin-bottom: 15px;"></i>
+            <h2>مصر بكرة للتنمية</h2>
+            <p>المنظومة الذكية لإدارة الحضور</p>
+            <div class="input-group">
+                <input type="text" id="user-input" class="input-field" placeholder="اسم المستخدم">
             </div>
-        </div>
-
-        <div class="chips-group">
-            <span class="chips-label">الفترة :</span>
-            <div class="chips">
-                <div class="chip active" data-type="shift" onclick="filterByShift('all', this)">الكل</div>
-                <div class="chip" data-type="shift" onclick="filterByShift('صباحي', this)">صباحي</div>
-                <div class="chip" data-type="shift" onclick="filterByShift('مسائي', this)">مسائي</div>
-                <div id="topSort" class="chip" style="background:#fff2e6; border:1px solid #ffd8b3;" onclick="toggleSort(this)">🏆 الأكثر حضوراً</div>
+            <div class="input-group">
+                <input type="password" id="pass-input" class="input-field" placeholder="كلمة المرور">
             </div>
-        </div>
-
-        <div class="date-inputs">
-            <span>من:</span> <input type="date" id="dateStart" onchange="processData()">
-            <span>إلى:</span> <input type="date" id="dateEnd" onchange="processData()">
+            <button class="btn btn-primary" onclick="handleLogin()" style="margin-top: 10px;">
+                تسجيل الدخول <i class="fas fa-sign-in-alt"></i>
+            </button>
+            <p id="login-error"
+                style="color: var(--danger); font-size: 14px; font-weight: bold; margin-top: 15px; display: none;">خطأ
+                في البيانات</p>
         </div>
     </div>
 
-    <div id="pageEntry" class="page active">
-        <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> تسجيل حضور الطلاب</h3>
-            <textarea id="inputIds" rows="3" style="width: 100%; padding:10px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;" placeholder="أدخل أرقام الطلاب مسافات أو أسطر..."></textarea>
-            
-            <div class="prog-grid">
-                <div class="prog-item" data-v="تعليم" onclick="toggleProg(this)"><i class="fas fa-graduation-cap" style="color:#27ae60"></i><span>تعليم</span></div>
-                <div class="prog-item" data-v="صحة" onclick="toggleProg(this)"><i class="fas fa-heartbeat" style="color:#e74c3c"></i><span>صحة</span></div>
-                <div class="prog-item" data-v="كمبيوتر" onclick="toggleProg(this)"><i class="fas fa-desktop" style="color:#3498db"></i><span>كمبيوتر</span></div>
-                <div class="prog-item" data-v="رياضة" onclick="toggleProg(this)"><i class="fas fa-volleyball-ball" style="color:#f1c40f"></i><span>رياضة</span></div>
-                <div class="prog-item" data-v="تدريب" onclick="toggleProg(this)"><i class="fas fa-dumbbell" style="color:#2d3436"></i><span>تدريب</span></div>
-                <div class="prog-item" data-v="بروك" onclick="toggleProg(this)"><i class="fas fa-tree" style="color:#e67e22"></i><span>بروك</span></div>
-                <div class="prog-item" data-v="حفلة" onclick="toggleProg(this)"><i class="fas fa-birthday-cake" style="color:#fd79a8"></i><span>حفلة</span></div>
-                <div class="prog-item" data-v="رحلة" onclick="toggleProg(this)"><i class="fas fa-bus" style="color:#1abc9c"></i><span>رحلة</span></div>
-                <div class="prog-item" data-v="فن" onclick="toggleProg(this)"><i class="fas fa-palette" style="color:#9b59b6"></i><span>فن</span></div>
-                <div class="prog-item" data-v="نشاط" onclick="toggleProg(this)"><i class="fas fa-running" style="color:#ff9f43"></i><span>نشاط</span></div>
-                <div class="prog-item" data-v="معسكر" onclick="toggleProg(this)"><i class="fas fa-campground" style="color:#0abde3"></i><span>معسكر</span></div>
-            </div>
-
-            <input type="text" id="progDetails" class="search-input" style="margin-top: 5px; margin-bottom: 5px;" placeholder="تفاصيل إضافية للبرنامج (اختياري)...">
-
-            <div class="multi-select-container">
-                <div class="select-box" onclick="toggleTeachers()">
-                    <span id="teacherPlaceholder">-- اختر المدرسين --</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div id="teachersDropdown" class="dropdown-content">
-                    <label class="dropdown-item"><input type="checkbox" value="mohamed"> mohamed</label>
-                    <label class="dropdown-item"><input type="checkbox" value="karim"> karim</label>
-                    <label class="dropdown-item"><input type="checkbox" value="mostafa"> mostafa</label>
-                    <label class="dropdown-item"><input type="checkbox" value="osama"> osama</label>
-                    <label class="dropdown-item"><input type="checkbox" value="said"> said</label>
-                    <label class="dropdown-item"><input type="checkbox" value="islam"> islam</label>
-                    <label class="dropdown-item"><input type="checkbox" value="sohaila"> sohaila</label>
-                    <label class="dropdown-item"><input type="checkbox" value="dawlat"> dawlat</label>
-                    <label class="dropdown-item"><input type="checkbox" value="alaa"> alaa</label>
+    <div id="app-content">
+        <header>
+            <div class="user-info">
+                <div class="user-avatar" id="avatar-initial">م</div>
+                <div>
+                    <div id="display-name" style="font-weight: 800; font-size: 15px;">...</div>
+                    <div id="display-role" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">...
+                    </div>
                 </div>
             </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="admin-pending-badge" style="display:none; position:relative; cursor:pointer;"
+                    onclick="switchView('leaves', document.querySelector('.nav-item:nth-child(3)'))">
+                    <i class="fas fa-bell" style="color: #f59e0b; font-size: 24px;"></i>
+                    <span id="header-pending-count"
+                        style="position:absolute; top:-6px; right:-6px; background:var(--danger); color:white; border-radius:50%; width: 18px; height: 18px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold;">0</span>
+                </div>
 
-            <button class="btn-sync" style="background:var(--primary)" onclick="submitAttendance()">تسجيل الحضور</button>
+                <button onclick="logout()"
+                    style="background:none; border:none; color:var(--danger); cursor:pointer; padding: 10px; background: #fee2e2; border-radius: 12px;">
+                    <i class="fas fa-power-off fa-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div id="view-home" class="view">
+
+                <div id="teacher-stats" style="display:none;">
+                    <button class="btn btn-info" onclick="openMyInfo()"
+                        style="width:100%; margin-bottom: 20px; font-size: 18px; padding: 16px; border-radius: 20px;">
+                        معلوماتي (البروفايل) <i class="fas fa-id-card" style="margin-right: 8px;"></i>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-user-edit"></i> لوحة تسجيل الحضور</div>
+                    <div class="input-group">
+                        <label>تاريخ الحضور</label>
+                        <input type="date" id="att-date" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label>أكواد الطلاب (جماعي)</label>
+                        <textarea id="att-student-ids" class="input-field" rows="3"
+                            placeholder="أدخل الأكواد متبوعة بمسافة..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>البرامج</label>
+                        <div class="multi-select" id="prog-chips"></div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="prog-notes" class="input-field"
+                            placeholder="معلومة إضافية عن البرنامج (اختياري)...">
+                    </div>
+                    <div class="input-group">
+                        <label>المدرسين</label>
+                        <div class="custom-dropdown" id="teacher-dropdown-container">
+                            <div class="dropdown-header" onclick="toggleTeacherDropdown()">
+                                <span>اختر المدرسين...</span>
+                                <i class="fas fa-chevron-up"></i>
+                            </div>
+                            <div class="dropdown-list" id="teacher-list-upward">
+                                <div style="font-size: 13px; color: var(--text-muted); text-align: center;">جاري
+                                    التحميل...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="submitAttendance()" style="margin-top: 20px;">
+                        إرسال كشف الحضور <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="view-reports" class="view" style="display:none;">
+
+                <div class="filter-tools">
+                    <label style="font-weight:800; font-size:14px; width:100%;"><i class="fas fa-calendar-alt"
+                            style="color:var(--primary);"></i> الفلترة بتاريخ (الافتراضي: الشهر الحالي)</label>
+                    <input type="date" id="report-start-date" class="input-field" style="flex:1; min-width:120px;">
+                    <input type="date" id="report-end-date" class="input-field" style="flex:1; min-width:120px;">
+                    <button class="btn btn-primary" style="width:auto; padding: 13px 20px;"
+                        onclick="applyDateFilter()">تطبيق <i class="fas fa-filter"></i></button>
+                </div>
+
+                <div class="sub-tabs" id="reports-sub-tabs">
+                    <button class="sub-tab-btn active" onclick="switchSubTab('students')"
+                        id="tab-btn-students">الطلاب</button>
+                    <button class="sub-tab-btn" onclick="switchSubTab('programs')"
+                        id="tab-btn-programs">البرامج</button>
+                    <button class="sub-tab-btn" onclick="switchSubTab('teachers')"
+                        id="tab-btn-teachers">المدرسين</button>
+                </div>
+
+                <div id="sub-view-students" class="sub-view">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-users"></i> إحصائيات الطلاب</div>
+
+                        <div class="quick-filters" id="student-filters-container">
+                            <button class="btn btn-primary" id="filter-all"
+                                onclick="filterStudents('all')">الكل</button>
+                            <button class="btn btn-outline" id="filter-morning" onclick="filterStudents('صباحي')">صباحي
+                                <i class="fas fa-sun" style="color:#eab308"></i></button>
+                            <button class="btn btn-outline" id="filter-evening" onclick="filterStudents('مسائي')">مسائي
+                                <i class="fas fa-moon" style="color:#6366f1"></i></button>
+                            <button class="btn btn-outline" id="filter-top" onclick="filterStudents('top')">الأكثر
+                                حضوراً <i class="fas fa-trophy" style="color:#f59e0b"></i></button>
+                        </div>
+
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="student-search" class="input-field"
+                                placeholder="ابحث بالاسم أو الكود..." onkeyup="renderStudentsTable()">
+                        </div>
+                        <div class="table-container">
+                            <table id="table-students">
+                                <thead>
+                                    <tr>
+                                        <th>الكود</th>
+                                        <th>الاسم (والفترة)</th>
+                                        <th>أيام الحضور</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sub-view-programs" class="sub-view" style="display:none;">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-layer-group"></i> تقرير البرامج</div>
+                        <div class="table-container">
+                            <table id="table-programs">
+                                <thead>
+                                    <tr>
+                                        <th>البرنامج</th>
+                                        <th>إجمالي الأيام</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sub-view-teachers" class="sub-view" style="display:none;">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-chalkboard-teacher"></i> كشف المدرسين</div>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="teacher-search" class="input-field" placeholder="ابحث باسم المدرس..."
+                                onkeyup="filterTable('teacher-search', 'table-teachers-report')">
+                        </div>
+                        <div class="table-container">
+                            <table id="table-teachers-report">
+                                <thead>
+                                    <tr>
+                                        <th>المدرس</th>
+                                        <th>حضور</th>
+                                        <th>غياب</th>
+                                        <th>إجازات</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-leaves" class="view" style="display:none;">
+                <div style="margin-bottom: 20px;">
+                    <button id="admin-leave-btn" class="btn btn-primary" onclick="openAdminLeaveModal()"
+                        style="display: none; background: var(--warning); border-radius: 16px;">
+                        <i class="fas fa-plus-circle"></i> تسجيل إجازة
+                    </button>
+                    <button id="teacher-leave-btn" class="btn btn-primary" onclick="openTeacherLeaveModal()"
+                        style="display: none; border-radius: 16px;">
+                        <i class="fas fa-paper-plane"></i> تقديم طلب إجازة
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-history"></i> سجل الطلبات والإجازات</div>
+                    <div class="table-container">
+                        <table id="table-leaves">
+                            <thead>
+                                <tr>
+                                    <th>المدرس</th>
+                                    <th>التاريخ</th>
+                                    <th>النوع</th>
+                                    <th>الحالة</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchView('home', this)">
+                <i class="fas fa-home"></i><span>الرئيسية</span>
+            </div>
+            <div class="nav-item" onclick="switchView('reports', this)">
+                <i class="fas fa-chart-pie"></i><span>التقارير</span>
+            </div>
+            <div class="nav-item" onclick="switchView('leaves', this)">
+                <i class="fas fa-calendar-alt"></i><span>الإجازات</span>
+            </div>
         </div>
     </div>
 
-    <div id="pageReports" class="page">
-        <button class="btn-sync" onclick="fetchAndSync()">تحديث البيانات <i class="fas fa-sync"></i></button>
-        
-        <div class="summary-cards" id="topSummaryCards">
+    <div class="modal" id="student-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('student-modal')"><i class="fas fa-times"></i></span>
+            <div class="student-modal-header">
+                <img id="modal-img" class="student-modal-img" src="https://via.placeholder.com/150">
+                <h3 id="modal-name" class="student-modal-name">اسم الطالب</h3>
+                <div id="modal-code" class="student-modal-code">كود: #</div>
             </div>
-
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab('tab-students', this)">كشف الطلاب</button>
-            <button class="tab-btn" onclick="switchTab('tab-teachers', this)">كشف المدرسين</button>
-            <button class="tab-btn" onclick="switchTab('tab-programs', this)">كشف البرامج</button>
-        </div>
-
-        <div id="tab-students" class="tab-content active card">
-            <input type="text" id="studentSearch" class="search-input" onkeyup="filterSearchTable(this, 'reportTableBody')" placeholder="بحث بالكود أو اسم الطالب...">
-            <div class="table-res">
-                <table>
-                    <thead>
-                        <tr><th>ID</th><th>الاسم</th><th>أيام الحضور</th><th>عدد الحصص</th></tr>
-                    </thead>
-                    <tbody id="reportTableBody"></tbody>
-                </table>
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="stat-item" style="padding: 15px;"><span class="value" id="modal-days"
+                        style="color: var(--primary);">0</span><span class="label">أيام الحضور</span></div>
+                <div class="stat-item" style="padding: 15px; border-top-color: var(--secondary);"><span class="value"
+                        id="modal-lecs" style="color: var(--secondary);">0</span><span class="label">إجمالي الحصص</span>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <label style="font-weight: 800; font-size: 14px; margin-bottom: 10px; display: block;">البرامج المشارك
+                    فيها:</label>
+                <div class="multi-select" id="modal-programs-list" style="pointer-events: none;"></div>
             </div>
         </div>
-
-        <div id="tab-teachers" class="tab-content card">
-            <input type="text" id="teacherSearch" class="search-input" onkeyup="filterSearchTable(this, 'teachersStatsBody')" placeholder="بحث باسم المدرس...">
-            <div class="table-res">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>إسم المدرس</th>
-                            <th>أيام العمل</th>
-                            <th>تفصيل البرامج (الأيام)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="teachersStatsBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tab-programs" class="tab-content card">
-            <div class="table-res">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>البرنامج</th>
-                            <th>أيام العمل</th>
-                            <th>إجمالي الحصص</th>
-                        </tr>
-                    </thead>
-                    <tbody id="programsStatsBody"></tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
-</div>
 
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <div class="profile-img-container">
-            <img id="modalImg" src="https://via.placeholder.com/150" class="profile-img">
+    <div class="modal" id="teacher-profile-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('teacher-profile-modal')"><i class="fas fa-times"></i></span>
+            <div class="student-modal-header">
+                <img id="tp-img" class="student-modal-img" src="https://via.placeholder.com/150">
+                <h3 id="tp-name" class="student-modal-name">الاسم</h3>
+                <div style="margin-top: 15px;">
+                    <span class="badge"
+                        style="background: #eff6ff; color: var(--primary); font-size: 15px; padding: 8px 16px; border: 1px solid #bfdbfe;">
+                        الرصيد المتبقي للإجازات: <span id="tp-balance"
+                            style="font-weight: 900; font-size: 18px;">0</span>
+                    </span>
+                </div>
+            </div>
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="stat-item" style="border-top-color: var(--success);"><span class="value" id="tp-present"
+                        style="color: var(--success);">0</span><span class="label">حضور</span></div>
+                <div class="stat-item" style="border-top-color: var(--danger);"><span class="value" id="tp-absent"
+                        style="color: var(--danger);">0</span><span class="label">غياب</span></div>
+                <div class="stat-item" style="border-top-color: var(--warning);"><span class="value" id="tp-leaves"
+                        style="color: var(--warning);">0</span><span class="label">إجازات</span></div>
+            </div>
+            <div>
+                <label
+                    style="font-weight: 800; font-size: 15px; display: block; margin-bottom: 12px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">البرامج
+                    المشارك فيها وعددها:</label>
+                <div id="tp-programs-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+            </div>
         </div>
-        <h2 id="modalName" style="margin: 0; color: var(--primary);">الاسم</h2>
-        <div style="background: #f8f9fa; border-radius: 15px; padding: 15px; margin: 15px 0; display: flex; justify-content: space-around;">
-             <div><small id="modalDaysLabel">أيام الحضور</small><br><strong id="modalDays">0</strong></div>
-            <div><small id="modalLecsLabel">إجمالي الحصص</small><br><strong id="modalLecs">0</strong></div>
-        </div>
-        <div class="badge-list" id="modalProgList"></div>
     </div>
-</div>
 
-<nav class="nav">
-    <div class="nav-item active" onclick="navigate('pageEntry', this)"><i class="fas fa-plus-circle"></i><span>تسجيل</span></div>
-    <div class="nav-item" onclick="navigate('pageReports', this)"><i class="fas fa-chart-pie"></i><span>التقارير والإحصائيات</span></div>
-</nav>
+    <div class="modal" id="admin-leave-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('admin-leave-modal')"><i class="fas fa-times"></i></span>
+            <h3
+                style="margin-top: 0; color: var(--text-dark); border-bottom: 2px solid var(--bg); padding-bottom: 15px;">
+                <i class="fas fa-user-edit text-warning"></i> تسجيل إجازة للمدرسين</h3>
+            <div class="input-group" style="margin-top: 20px;">
+                <label>اختر المدرس</label>
+                <select id="manual-teacher-name" class="input-field"></select>
+            </div>
+            <div class="input-group">
+                <label>تاريخ الإجازة</label>
+                <input type="date" id="manual-leave-date" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>نوع الإجازة</label>
+                <select id="manual-leave-type" class="input-field">
+                    <option value="اعتيادي">اعتيادي (خصم من الرصيد)</option>
+                    <option value="عارضة">عارضة (خصم من الرصيد)</option>
+                    <option value="مأمورية">مأمورية (بدون خصم)</option>
+                    <option value="مرضي">مرضي (بدون خصم)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="background: var(--warning); margin-top: 15px;"
+                onclick="submitManualLeave()">اعتماد الإجازة <i class="fas fa-check"></i></button>
+        </div>
+    </div>
 
-<div id="overlayBlur" class="overlay-blur"></div>
-<div id="successPopup" class="success-popup">
-    <i class="fas fa-check-circle"></i>
-    <h2>الله ينور يا عسلية</h2>
-    <p style="font-size: 0.8rem; color: #666;">تم تسجيل الحضور بنجاح ✅</p>
-</div>
+    <div class="modal" id="teacher-leave-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('teacher-leave-modal')"><i class="fas fa-times"></i></span>
+            <h3
+                style="margin-top: 0; color: var(--text-dark); border-bottom: 2px solid var(--bg); padding-bottom: 15px;">
+                <i class="fas fa-calendar-plus text-primary"></i> نموذج طلب إجازة</h3>
+            <div class="input-group" style="margin-top: 20px;">
+                <label>تاريخ الإجازة المطلوبة</label>
+                <input type="date" id="req-leave-date" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>نوع الإجازة</label>
+                <select id="req-leave-type" class="input-field">
+                    <option value="اعتيادي">اعتيادي</option>
+                    <option value="عارضة">عارضة</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="margin-top: 15px;" onclick="submitLeaveRequest()">إرسال الطلب للإدارة
+                <i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
-<script>
-    const GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbz4xugO-5lish7nbQAiizHDAEzUDsrx_RAEdKCGi-26iYI3mO1C0x8pQVlYIsN8HDW9/exec";
-    const ATTENDANCE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=2115232542&single=true&output=csv";
-    const STUDENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw-I7O8z30N-sEapLs4x5wysB_FN08zD6ECfWW3o2NrYFqOITnfQQZg0DESfeA-NyIkMSw8DnFEmWX/pub?gid=0&single=true&output=csv";
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyLKLD5wioLpPDYP-hBgcNRZRNLd9Nzy4i0GXCDmEdnsh1mCeM1TAoSJtBA-scaxXYqg/exec";
 
-    let rawAttendance = [];
-    let studentsShiftData = {}; 
-    let finalProcessedData = {};
-    let teacherStats = {}; 
-    let programStats = {};
-    let centerWorkDays = new Set();
-    let teacherLeaves = {};
-    let selectedShift = 'all';
-    let isSortingActive = false;
+        let currentUser = JSON.parse(localStorage.getItem('mb_user')) || null;
+        let dashboardData = null;
+        let currentStudentFilter = 'all'; // الفلتر الافتراضي للطلاب
 
-    // التنقل بين الصفحات الرئيسية
-    function navigate(pageId, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('filterSection').style.display = (pageId === 'pageEntry') ? 'none' : 'block';
-    }
+        // البرامج والألوان الجديدة
+        const PROGRAMS_LIST = [
+            { name: "تعليم", icon: "fa-book-reader", color: "#3b82f6" },
+            { name: "كمبيوتر", icon: "fa-laptop", color: "#8b5cf6" },
+            { name: "رياضة", icon: "fa-futbol", color: "#22c55e" },
+            { name: "فن", icon: "fa-palette", color: "#ec4899" },
+            { name: "صحة", icon: "fa-stethoscope", color: "#ef4444" },
+            { name: "تدريب", icon: "fa-chalkboard-teacher", color: "#f59e0b" },
+            { name: "بروك", icon: "fa-project-diagram", color: "#6366f1" },
+            { name: "رحلة", icon: "fa-bus-alt", color: "#14b8a6" },
+            { name: "حفلة", icon: "fa-glass-cheers", color: "#f43f5e" },
+            { name: "نشاط", icon: "fa-puzzle-piece", color: "#eab308" },
+            { name: "معسكر", icon: "fa-campground", color: "#10b981" },
+            { name: "إجتماع", icon: "fa-users", color: "#64748b" }
+        ];
 
-    // التنقل بين التبويبات الداخلية في صفحة التقارير
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        el.classList.add('active');
-    }
+        window.onload = () => {
+            setDefaultDates();
+            if (currentUser) { initApp(); }
+            const today = new Date();
+            if (document.getElementById('att-date')) document.getElementById('att-date').valueAsDate = today;
+            if (document.getElementById('manual-leave-date')) document.getElementById('manual-leave-date').valueAsDate = today;
+            if (document.getElementById('req-leave-date')) document.getElementById('req-leave-date').valueAsDate = today;
 
-    function toggleProg(el) { el.classList.toggle('selected'); }
-    function toggleTeachers() { document.getElementById('teachersDropdown').classList.toggle('show'); }
+            // رسم أيقونات البرامج وتلوينها
+            document.getElementById('prog-chips').innerHTML = PROGRAMS_LIST.map(p =>
+                `<div class="chip" onclick="toggleChip(this)" data-val="${p.name}">
+                    <i class="fas ${p.icon}" style="color: ${p.color};"></i> ${p.name}
+                </div>`
+            ).join('');
 
-    function showSuccessMessage() {
-        const popup = document.getElementById('successPopup');
-        const blur = document.getElementById('overlayBlur');
-        popup.classList.add('show');
-        blur.style.display = 'block';
-        setTimeout(() => {
-            popup.classList.remove('show');
-            blur.style.display = 'none';
-        }, 2000);
-    }
-
-    async function submitAttendance() {
-        let idsInput = document.getElementById('inputIds').value.trim();
-        const teachers = Array.from(document.querySelectorAll('#teachersDropdown input:checked')).map(i => i.value).join(' & ');
-        
-        // جلب البرامج الأساسية
-        let progs = Array.from(document.querySelectorAll('.prog-item.selected')).map(i => i.dataset.v).join(' & ');
-        
-        // إضافة التفاصيل إذا وجدت
-        const extraDetails = document.getElementById('progDetails').value.trim();
-        if(extraDetails) {
-            if(progs) progs += ` - ${extraDetails}`;
-            else progs = extraDetails;
-        }
-
-        if(idsInput !== "13579" && (!idsInput || !teachers || !progs)) return alert("برجاء إدخال الأكواد واختيار المدرس والبرنامج");
-        if(idsInput === "13579" && !teachers) return alert("برجاء اختيار المدرس لتسجيل إجازته");
-
-        let idsProcessed = idsInput.split(/[\s\n,]+/).filter(i => i.length > 0).join(' . ');
-        const url = `${GOOGLE_SCRIPT}?ids=${encodeURIComponent(idsProcessed)}&program=${encodeURIComponent(progs)}&teacher=${encodeURIComponent(teachers)}`;
-        
-        try {
-            const img = new Image();
-            img.src = url;
-            showSuccessMessage();
-            document.getElementById('inputIds').value = "";
-            document.getElementById('progDetails').value = "";
-            document.querySelectorAll('.prog-item').forEach(p => p.classList.remove('selected'));
-            document.querySelectorAll('#teachersDropdown input').forEach(i => i.checked = false);
-            document.getElementById('teachersDropdown').classList.remove('show');
-        } catch (e) { alert("حدث خطأ في الاتصال"); }
-    }
-
-    async function fetchAndSync() {
-        const btn = document.querySelector('.btn-sync');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
-        try {
-            const resStu = await fetch(STUDENTS_CSV);
-            const textStu = await resStu.text();
-            const rowsStu = textStu.split('\n').map(r => r.split(','));
-            studentsShiftData = {};
-            rowsStu.slice(1).forEach(r => {
-                const id = r[0]?.trim();
-                const name = r[1]?.trim();
-                const shift = r[2]?.trim();
-                if(id) studentsShiftData[id] = { name, shift };
+            // إغلاق قائمة المدرسين عند النقر خارجها
+            document.addEventListener('click', function (event) {
+                const isClickInside = document.getElementById('teacher-dropdown-container')?.contains(event.target);
+                if (!isClickInside && document.getElementById('teacher-list-upward')) {
+                    document.getElementById('teacher-list-upward').classList.remove('show');
+                }
             });
+        };
 
-            const resAtt = await fetch(ATTENDANCE_CSV);
-            const textAtt = await resAtt.text();
-            rawAttendance = textAtt.split('\n').map(r => r.split(',')).slice(1);
-            
-            processData();
-        } catch(e) { 
-            console.error(e);
-            alert("فشل جلب البيانات. تأكد من اتصالك بالإنترنت ونشر الشيت."); 
+        // دالة تحديد الشهر الحالي كافتراضي في مدخلات التاريخ
+        function setDefaultDates() {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+            const toISODate = (d) => {
+                const z = n => ('0' + n).slice(-2);
+                return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+            };
+
+            document.getElementById('report-start-date').value = toISODate(firstDay);
+            document.getElementById('report-end-date').value = toISODate(lastDay);
         }
-        btn.innerHTML = 'تحديث البيانات <i class="fas fa-sync"></i>';
-    }
 
-    function processData() {
-        const start = document.getElementById('dateStart').value;
-        const end = document.getElementById('dateEnd').value;
-        
-        finalProcessedData = {};
-        teacherStats = {};
-        programStats = {};
-        centerWorkDays = new Set();
-        teacherLeaves = {};
+        function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
 
-        rawAttendance.forEach(row => {
-            if(row.length < 6) return;
-            
-            let idsRaw = row[1] ? row[1].replace(/"/g, '').trim() : "";
-            let date = row[3] ? row[3].trim() : "";
-            let progsRaw = row[5] ? row[5].replace(/"/g, '').trim() : "";
-            let teacherRaw = row[6] ? row[6].replace(/"/g, '').trim() : "";
+        async function handleLogin() {
+            const u = document.getElementById('user-input').value;
+            const p = document.getElementById('pass-input').value;
+            if (!u || !p) return alert("الرجاء إكمال البيانات");
+            showLoader(true);
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: u, password: p }) });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    currentUser = data.user;
+                    localStorage.setItem('mb_user', JSON.stringify(currentUser));
+                    initApp();
+                } else {
+                    document.getElementById('login-error').style.display = 'block';
+                    document.getElementById('login-error').innerText = data.message;
+                }
+            } catch (e) { alert("فشل الاتصال بخادم جوجل"); }
+            showLoader(false);
+        }
 
-            if(!idsRaw || !date) return;
-            if(start && date < start) return;
-            if(end && date > end) return;
+        function logout() { localStorage.removeItem('mb_user'); location.reload(); }
 
-            centerWorkDays.add(date);
+        async function initApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+            document.getElementById('display-name').innerText = currentUser.name;
+            document.getElementById('display-role').innerText = currentUser.role === 'Admin' ? 'المدير ' : 'مدرس';
+            document.getElementById('avatar-initial').innerText = currentUser.name.charAt(0);
 
-            const idList = idsRaw.split(/[^\d]+/).filter(i => i.length > 0);
-            const progList = progsRaw ? progsRaw.split('&').map(p => p.trim()) : [];
-            const teacherList = teacherRaw ? teacherRaw.split('&').map(t => t.trim()) : [];
+            if (currentUser.role === 'Admin') {
+                document.getElementById('teacher-stats').style.display = 'none';
+                document.getElementById('tab-btn-programs').style.display = 'inline-block';
+                document.getElementById('tab-btn-teachers').style.display = 'inline-block';
+                document.getElementById('admin-leave-btn').style.display = 'inline-flex';
+                document.getElementById('teacher-leave-btn').style.display = 'none';
+                document.getElementById('admin-pending-badge').style.display = 'block'; // إظهار الجرس
+            } else {
+                document.getElementById('teacher-stats').style.display = 'block';
+                document.getElementById('tab-btn-programs').style.display = 'none';
+                document.getElementById('tab-btn-teachers').style.display = 'none';
+                document.getElementById('admin-leave-btn').style.display = 'none';
+                document.getElementById('teacher-leave-btn').style.display = 'inline-flex';
+                document.getElementById('admin-pending-badge').style.display = 'none'; // إخفاء الجرس للمدرس
+            }
+            await fetchDashboard();
+        }
 
-            if (idList.includes("13579")) {
-                teacherList.forEach(t => {
-                    if(t && t !== "") {
-                        if(!teacherLeaves[t]) teacherLeaves[t] = new Set();
-                        teacherLeaves[t].add(date);
-                    }
+        async function fetchDashboard() {
+            showLoader(true);
+            const startDate = document.getElementById('report-start-date').value;
+            const endDate = document.getElementById('report-end-date').value;
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getDashboard',
+                        username: currentUser.username,
+                        role: currentUser.role,
+                        name: currentUser.name,
+                        startDate: startDate,
+                        endDate: endDate
+                    })
                 });
-                return; 
+                dashboardData = await res.json();
+                if (dashboardData.status === 'success') {
+                    populateTeacherLists();
+                    renderUI(dashboardData.data);
+                }
+            } catch (e) { console.error(e); }
+            showLoader(false);
+        }
+
+        // تطبيق فلتر التاريخ عند الضغط على زر "تطبيق"
+        function applyDateFilter() {
+            fetchDashboard();
+        }
+
+        function toggleTeacherDropdown() { document.getElementById('teacher-list-upward').classList.toggle('show'); }
+        function selectTeacherOption(el) { el.classList.toggle('selected'); }
+
+        function populateTeacherLists() {
+            const d = dashboardData.data;
+            let teachersList = [];
+            if (d.users && Array.isArray(d.users)) {
+                teachersList = d.users.map(u => u.name);
+            } else {
+                teachersList = [currentUser.name];
+            }
+            teachersList = [...new Set(teachersList)];
+
+            const listContainer = document.getElementById('teacher-list-upward');
+            listContainer.innerHTML = teachersList.map(tName =>
+                `<div class="teacher-option ${tName === currentUser.name ? 'selected' : ''}" onclick="selectTeacherOption(this)" data-val="${tName}">
+                    <i class="fas fa-user-circle"></i> ${tName}
+                </div>`
+            ).join('');
+
+            if (currentUser.role === 'Admin') {
+                document.getElementById('manual-teacher-name').innerHTML = teachersList.map(tName => `<option value="${tName}">${tName}</option>`).join('');
+            }
+        }
+
+        function renderUI(d) {
+            // تحديث رقم جرس الطلبات للمدير
+            if (currentUser.role === 'Admin') {
+                const pendingCount = d.pendingLeavesCount || 0;
+                document.getElementById('header-pending-count').innerText = pendingCount;
             }
 
-            idList.forEach(id => {
-                if (!studentsShiftData[id]) return; 
+            // رسم قائمة الطلاب وإعمال الفلتر (صباحي / مسائي / ...)
+            renderStudentsTable();
 
-                const sInfo = studentsShiftData[id];
-                if(selectedShift !== 'all' && sInfo.shift !== selectedShift) return;
+            if (currentUser.role === 'Admin' && d.programs) {
+                const progBody = document.querySelector('#table-programs tbody');
+                progBody.innerHTML = d.programs.map(p => `<tr><td style="font-weight:800;">${p.name}</td><td><span class="badge bg-approved">${p.days} يوم</span></td></tr>`).join('');
+            }
 
-                if(!finalProcessedData[id]) {
-                    finalProcessedData[id] = { id, name: sInfo.name, days: new Set(), lecs: 0, progs: new Set() };
+            if (currentUser.role === 'Admin' && d.teachersReport) {
+                const teachBody = document.querySelector('#table-teachers-report tbody');
+                teachBody.innerHTML = d.teachersReport.map(t => `
+                    <tr onclick='openTeacherProfileModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'>
+                        <td style="font-weight:800; color: var(--info);"><i class="fas fa-user-circle"></i> ${t.name}</td>
+                        <td style="color:var(--success); font-weight:900;">${t.presentDays || 0}</td>
+                        <td style="color:var(--danger); font-weight:900;">${t.absentDays || 0}</td>
+                        <td style="color:var(--warning); font-weight:900;">${t.leaveDays || 0}</td>
+                    </tr>`).join('');
+            }
+
+            // رسم الإجازات
+            const leaveBody = document.querySelector('#table-leaves tbody');
+            const leaves = currentUser.role === 'Admin' ? (d.pendingLeaves || []) : (d.myLeaves || []);
+            leaveBody.innerHTML = leaves.map(l => {
+                const statusClass = l.status === 'Pending' ? 'bg-pending' : (l.status === 'Approved' ? 'bg-approved' : 'bg-rejected');
+                const statusAr = l.status === 'Pending' ? 'قيد الانتظار' : (l.status === 'Approved' ? 'مقبول' : 'مرفوض');
+                let actions = '-';
+                if (currentUser.role === 'Admin' && l.status === 'Pending') {
+                    actions = `
+                        <div style="display:flex; justify-content:center; gap:10px;">
+                            <button onclick="manageLeave('${l.id}', 'Approved')" style="color:var(--success); border:none; background:none; font-size:22px; cursor:pointer;"><i class="fas fa-check-circle"></i></button>
+                            <button onclick="manageLeave('${l.id}', 'Rejected')" style="color:var(--danger); border:none; background:none; font-size:22px; cursor:pointer;"><i class="fas fa-times-circle"></i></button>
+                        </div>`;
                 }
-                finalProcessedData[id].days.add(date);
-                finalProcessedData[id].lecs += progList.length;
-                progList.forEach(p => finalProcessedData[id].progs.add(p));
+                return `<tr><td style="font-weight:700;">${l.teacher || currentUser.name}</td><td>${l.date}</td><td>${l.type || 'إجازة'}</td><td><span class="badge ${statusClass}">${statusAr}</span></td><td>${actions}</td></tr>`;
+            }).join('');
+        }
+
+        // دالة تصفية ورسم الطلاب (مربوطة بأزرار الفترة ومحرك البحث)
+        function filterStudents(type) {
+            currentStudentFilter = type;
+            // تظليل الزر المختار فقط
+            document.querySelectorAll('#student-filters-container .btn').forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline');
+            });
+            document.getElementById('filter-' + (type === 'صباحي' ? 'morning' : type === 'مسائي' ? 'evening' : type === 'top' ? 'top' : 'all')).classList.replace('btn-outline', 'btn-primary');
+            renderStudentsTable();
+        }
+
+        function renderStudentsTable() {
+            if (!dashboardData || !dashboardData.data) return;
+            let students = dashboardData.data.students || [];
+
+            const term = document.getElementById('student-search').value.toLowerCase();
+
+            // الفلترة بالاسم / الفترة
+            let filtered = students.filter(s => {
+                let matchSearch = (s.name || '').toLowerCase().includes(term) || (s.id || '').toString().includes(term);
+                let matchType = true;
+                if (currentStudentFilter === 'صباحي') matchType = s.shift === 'صباحي';
+                else if (currentStudentFilter === 'مسائي') matchType = s.shift === 'مسائي';
+                return matchSearch && matchType;
             });
 
-            // إحصائيات المدرسين: تسجيل الأيام وأنواع البرامج
-            teacherList.forEach(t => {
-                if(t && t !== "") {
-                    // هيكل جديد للمدرس يحمل الأيام والبرامج الخاصة به
-                    if(!teacherStats[t]) teacherStats[t] = { days: new Set(), progs: {} };
-                    teacherStats[t].days.add(date);
-                    
-                    progList.forEach(p => {
-                        if(p && p !== "") {
-                            if(!teacherStats[t].progs[p]) teacherStats[t].progs[p] = new Set();
-                            teacherStats[t].progs[p].add(date);
-                        }
-                    });
-                }
-            });
+            // ترتيب الأكثر حضوراً
+            if (currentStudentFilter === 'top') {
+                filtered.sort((a, b) => b.days - a.days);
+            }
 
-            // إحصائيات البرامج العامة
-            progList.forEach(p => {
-                if(p && p !== "") {
-                    if(!programStats[p]) programStats[p] = { days: new Set(), totalLecs: 0 };
-                    programStats[p].days.add(date);
-                    programStats[p].totalLecs++;
-                }
-            });
-        });
-
-        renderReports();
-    }
-
-    function renderReports() {
-        // 1. الكروت الإحصائية الثلاثة (الجمعية العامة)
-        const totalStudents = Object.keys(finalProcessedData).length;
-        const totalDays = centerWorkDays.size;
-        let totalClasses = 0;
-        for(let p in programStats) totalClasses += programStats[p].totalLecs;
-
-        document.getElementById('topSummaryCards').innerHTML = `
-            <div class="summary-card"><div class="val">${totalStudents}</div><div class="lbl">إجمالي الطلاب</div></div>
-            <div class="summary-card"><div class="val">${totalDays}</div><div class="lbl">أيام العمل الكلية</div></div>
-            <div class="summary-card"><div class="val">${totalClasses}</div><div class="lbl">الحصص المنفذة</div></div>
-        `;
-
-        // 2. كشف الطلاب
-        let sItems = Object.values(finalProcessedData);
-        if(isSortingActive) sItems.sort((a, b) => b.days.size - a.days.size);
-        const sHtml = sItems.map(s => `
-            <tr>
-                <td><span class="student-link" onclick="openProfile('${s.id}')">${s.id}</span></td>
-                <td>${s.name || '---'}</td>
-                <td><b>${s.days.size}</b> يوم</td>
-                <td>${s.lecs} حصص</td>
-            </tr>
-        `).join('');
-        document.getElementById('reportTableBody').innerHTML = sHtml || '<tr><td colspan="4">لا توجد بيانات</td></tr>';
-
-        // 3. كشف المدرسين (مع تفاصيل البرامج)
-        let tHtml = "";
-        for(let t in teacherStats) {
-            let data = teacherStats[t];
-            // تجهيز بادجات البرامج للمدرس
-            let progsBadges = Object.keys(data.progs).map(p => 
-                `<span class="badge">${p} (${data.progs[p].size})</span>`
-            ).join(' ');
-
-            tHtml += `<tr>
-                <td><span class="teacher-link" onclick="openTeacherProfile('${t}')">${t}</span></td>
-                <td><b>${data.days.size}</b> يوم</td>
-                <td style="line-height: 2;">${progsBadges || '---'}</td>
-            </tr>`;
+            const stuBody = document.querySelector('#table-students tbody');
+            stuBody.innerHTML = filtered.map(s => `
+                <tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
+                    <td style="font-weight:900; color:var(--primary)">${s.id}</td>
+                    <td style="font-weight:700;">${s.name} <br><span style="font-size:11px; color:var(--text-muted);">${s.shift}</span></td>
+                    <td><span class="badge bg-approved" style="font-size:13px;">${s.days} يوم</span></td>
+                </tr>`).join('');
         }
-        document.getElementById('teachersStatsBody').innerHTML = tHtml || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
 
-        // 4. كشف البرامج
-        let pHtml = "";
-        for(let p in programStats) {
-            pHtml += `<tr>
-                <td>${p}</td>
-                <td>${programStats[p].days.size} يوم</td>
-                <td><b>${programStats[p].totalLecs}</b> حصة</td>
-            </tr>`;
+        function toggleChip(el) { el.classList.toggle('selected'); }
+
+        function switchView(viewName, el) {
+            document.querySelectorAll('.view').forEach(v => { v.style.display = 'none'; v.style.animation = 'none'; });
+            const activeView = document.getElementById('view-' + viewName);
+            activeView.style.display = 'block';
+            setTimeout(() => activeView.style.animation = 'fadeIn 0.4s ease', 10);
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
         }
-        document.getElementById('programsStatsBody').innerHTML = pHtml || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
-    }
 
-    // دالة البحث العامة للجداول
-    function filterSearchTable(inputEl, tbodyId) {
-        const val = inputEl.value.toLowerCase();
-        document.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
-        });
-    }
-
-    function filterByShift(val, el) {
-        selectedShift = val;
-        document.querySelectorAll('[data-type="shift"]').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        processData();
-    }
-
-    function toggleSort(el) {
-        isSortingActive = !isSortingActive;
-        el.classList.toggle('active');
-        processData();
-    }
-
-    function quickDate(type, el) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        const now = new Date().toISOString().split('T')[0];
-        if(type === 'today') {
-            document.getElementById('dateStart').value = now;
-            document.getElementById('dateEnd').value = now;
-        } else if(type === 'month') {
-            document.getElementById('dateStart').value = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-            document.getElementById('dateEnd').value = now;
-        } else {
-            document.getElementById('dateStart').value = ""; document.getElementById('dateEnd').value = "";
+        function switchSubTab(subName) {
+            document.querySelectorAll('.sub-view').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeSub = document.getElementById('sub-view-' + subName);
+            activeSub.style.display = 'block'; activeSub.style.animation = 'fadeIn 0.3s ease';
+            document.getElementById('tab-btn-' + subName).classList.add('active');
         }
-        processData();
+
+        function filterTable(inputId, tableId) {
+            const term = document.getElementById(inputId).value.toLowerCase();
+            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+            rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
+        }
+        function openTeacherProfileModal(teacherObj) {
+    document.getElementById('tp-name').innerText = teacherObj.name;
+    
+    // تحديث الصورة ديناميكياً للمدرس
+    const teacherImg = document.getElementById('tp-img');
+    const tNameEncoded = encodeURIComponent(teacherObj.name);
+    teacherImg.src = `https://sindbadmasry.github.io/masrbokra/images/${tNameEncoded}.jpg`;
+    teacherImg.onerror = function() { this.src = "https://via.placeholder.com/150?text=Teacher"; };
+
+    document.getElementById('tp-balance').innerText = teacherObj.balance || 0;
+    document.getElementById('tp-present').innerText = teacherObj.presentDays || 0;
+    document.getElementById('tp-absent').innerText = teacherObj.absentDays || 0;
+    document.getElementById('tp-leaves').innerText = teacherObj.leaveDays || 0;
+    
+    const progsDiv = document.getElementById('tp-programs-list');
+    const progs = teacherObj.programs || {}; // كائن يحتوي على { اسم البرنامج: العدد }
+
+    if(Object.keys(progs).length === 0) {
+        progsDiv.innerHTML = '<span style="color:var(--text-muted); font-size:13px;">لا يوجد سجل للبرامج في هذه الفترة</span>';
+    } else {
+        progsDiv.innerHTML = Object.keys(progs).map(p => {
+            let pData = PROGRAMS_LIST.find(pl => pl.name === p) || { icon: 'fa-check', color: 'var(--primary)' };
+            return `
+                <div class="chip selected" style="padding: 8px 14px; font-size:13px; font-weight:800; border-color:${pData.color}; color:${pData.color}; background: #f8fafc;">
+                    <i class="fas ${pData.icon}"></i> ${p} 
+                    <span style="background:${pData.color}; color:white; border-radius:10px; padding: 2px 8px; margin-right:5px; font-size:11px; font-weight:bold;">
+                        ${progs[p]} مرة
+                    </span>
+                </div>`;
+        }).join('');
+    }
+    document.getElementById('teacher-profile-modal').style.display = 'flex';
+}
+       // --- دالة عرض بيانات الطالب ---
+function openStudentModal(studentObj) {
+    // 1. تعبئة البيانات الأساسية
+    document.getElementById('modal-name').innerText = studentObj.name;
+    document.getElementById('modal-code').innerText = "كود: " + studentObj.id;
+    
+    // 2. جلب الصورة ديناميكياً باستخدام ID
+    const studentImg = document.getElementById('modal-img');
+    if (studentImg) {
+        studentImg.src = `https://sindbadmasry.github.io/masrbokra/images/${studentObj.id}.jpg`;
+        // صورة بديلة في حال عدم وجود صورة للطالب
+        studentImg.onerror = function() { 
+            this.src = "https://via.placeholder.com/150?text=No+Photo"; 
+        };
     }
 
-    // فتح بروفايل الطالب
-    function openProfile(id) {
-        const s = finalProcessedData[id];
-        if(!s) return;
-        document.getElementById('modalName').innerText = s.name + " (" + s.id + ")";
-        document.getElementById('modalDays').innerText = s.days.size;
-        document.getElementById('modalLecs').innerText = s.lecs;
-        document.getElementById('modalDaysLabel').innerText = "أيام الحضور";
-        document.getElementById('modalLecsLabel').innerText = "إجمالي الحصص";
-        
-        const modalImg = document.getElementById('modalImg');
-        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${id}.jpg`; 
-        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
+    document.getElementById('modal-days').innerText = studentObj.days || 0;
+    document.getElementById('modal-lecs').innerText = studentObj.lectures || 0;
+    
+    // 3. حساب تكرار البرامج وعرضها
+    const progsDiv = document.getElementById('modal-programs-list');
+    if (progsDiv) {
+        const counts = {};
+        // التأكد من أن البرامج مصفوفة وحساب تكرارها
+        const progsArray = Array.isArray(studentObj.programs) ? studentObj.programs : [];
+        progsArray.forEach(p => { counts[p] = (counts[p] || 0) + 1; });
 
-        document.getElementById('modalProgList').innerHTML = Array.from(s.progs).map(p => `<span class="badge" style="background:#f1f2f6; color:#555; border:none;">${p}</span>`).join('');
-        document.getElementById('profileModal').style.display = 'block';
+        progsDiv.innerHTML = Object.keys(counts).map(p => {
+            let pData = (typeof PROGRAMS_LIST !== 'undefined') 
+                ? PROGRAMS_LIST.find(pl => pl.name === p) || { icon: 'fa-check', color: '#4f46e5' }
+                : { icon: 'fa-check', color: '#4f46e5' };
+            
+            return `
+                <div class="chip selected" style="padding: 6px 14px; font-size:13px; font-weight:800; border-color:${pData.color}; color:${pData.color}; background: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas ${pData.icon}"></i> 
+                    <span>${p}</span>
+                    <span style="background:${pData.color}; color:white; border-radius:10px; padding: 2px 8px; font-size:11px; min-width: 20px; text-align: center;">
+                        ${counts[p]}
+                    </span>
+                </div>`;
+        }).join('');
+    }
+    
+    document.getElementById('student-modal').style.display = 'flex';
+}
+
+// --- دالة عرض بيانات المدرس ---
+function openTeacherProfileModal(teacherObj) {
+    document.getElementById('tp-name').innerText = teacherObj.name;
+    
+    // 1. جلب صورة المدرس ديناميكياً باستخدام الاسم
+    const teacherImg = document.getElementById('tp-img');
+    if (teacherImg) {
+        const tNameEncoded = encodeURIComponent(teacherObj.name);
+        teacherImg.src = `https://sindbadmasry.github.io/masrbokra/images/${tNameEncoded}.jpg`;
+        teacherImg.onerror = function() { 
+            this.src = "https://via.placeholder.com/150?text=Teacher"; 
+        };
     }
 
-    // فتح بروفايل المدرس
-    function openTeacherProfile(tName) {
-        const workedDays = teacherStats[tName] ? teacherStats[tName].days.size : 0;
-        const totalCenterDays = centerWorkDays.size;
-        const annualLeavesTaken = teacherLeaves[tName] ? teacherLeaves[tName].size : 0;
-        const absenceDays = Math.max(0, Math.floor((totalCenterDays * 0.75) - workedDays - annualLeavesTaken));
-        const remainingLeave = 21 - annualLeavesTaken;
+    document.getElementById('tp-balance').innerText = teacherObj.balance || 0;
+    document.getElementById('tp-present').innerText = teacherObj.presentDays || 0;
+    document.getElementById('tp-absent').innerText = teacherObj.absentDays || 0;
+    document.getElementById('tp-leaves').innerText = teacherObj.leaveDays || 0;
+    
+    // 2. عرض البرامج مع عداد الحضور
+    const progsDiv = document.getElementById('tp-programs-list');
+    const progs = teacherObj.programs || {}; // الباك إند يرسلها كـ Object في العادة للمدرس
 
-        document.getElementById('modalName').innerText = "المدرس: " + tName;
-        const modalImg = document.getElementById('modalImg');
-        modalImg.src = `http://sindbadmasry.github.io/masrbokra/images/${tName}.jpg`; 
-        modalImg.onerror = function() { this.src = "http://sindbadmasry.github.io/masrbokra/images/0.jpg"; };
-
-        document.getElementById('modalDays').innerText = workedDays;
-        document.getElementById('modalLecs').innerText = absenceDays;
-        document.getElementById('modalDaysLabel').innerText = "أيام العمل الفعلية";
-        document.getElementById('modalLecsLabel').innerText = "غياب (بدون عذر)";
-
-        document.getElementById('modalProgList').innerHTML = `
-            <div class="badge" style="background:#2ecc71; color:white; border:none;">المتبقي: ${remainingLeave} يوم</div>
-            <div class="badge" style="background:#e67e22; color:white; border:none;">إجازات بطلب : ${annualLeavesTaken}</div>
-        `;
-        document.getElementById('profileModal').style.display = 'block';
+    if (Object.keys(progs).length === 0) {
+        progsDiv.innerHTML = '<span style="color:#6b7280; font-size:13px;">لا يوجد سجل للبرامج</span>';
+    } else {
+        progsDiv.innerHTML = Object.keys(progs).map(p => {
+            let pData = (typeof PROGRAMS_LIST !== 'undefined')
+                ? PROGRAMS_LIST.find(pl => pl.name === p) || { icon: 'fa-check', color: '#4f46e5' }
+                : { icon: 'fa-check', color: '#4f46e5' };
+                
+            return `
+                <div class="chip selected" style="padding: 8px 14px; font-size:13px; font-weight:800; border-color:${pData.color}; color:${pData.color}; background: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas ${pData.icon}"></i> 
+                    <span>${p}</span>
+                    <span style="background:${pData.color}; color:white; border-radius:10px; padding: 2px 8px; font-size:11px;">
+                        ${progs[p]} مرة
+                    </span>
+                </div>`;
+        }).join('');
     }
+    document.getElementById('teacher-profile-modal').style.display = 'flex';
+}
 
-    function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
-    if ('serviceWorker' in navigator) {
+        function openAdminLeaveModal() { document.getElementById('admin-leave-modal').style.display = 'flex'; }
+        function openTeacherLeaveModal() { document.getElementById('teacher-leave-modal').style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        async function submitAttendance() {
+            const ids = document.getElementById('att-student-ids').value;
+            const date = document.getElementById('att-date').value;
+            const selectedProgsBase = Array.from(document.querySelectorAll('#prog-chips .chip.selected')).map(c => c.getAttribute('data-val'));
+            const extraInfo = document.getElementById('prog-notes').value.trim();
+            const selectedTeachers = Array.from(document.querySelectorAll('#teacher-list-upward .teacher-option.selected')).map(c => c.getAttribute('data-val'));
+
+            if (!ids || !date || selectedProgsBase.length === 0 || selectedTeachers.length === 0) {
+                return alert("يرجى إكمال البيانات الأساسية (الطلاب، البرامج، والمدرسين).");
+            }
+            let finalProgramsStr = selectedProgsBase.join(" - ");
+            if (extraInfo) { finalProgramsStr += " (" + extraInfo + ")"; }
+
+            showLoader(true);
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'submitAttendance',
+                        ids: ids, customDate: date,
+                        programs: finalProgramsStr,
+                        teachers: selectedTeachers.join(" - ")
+                    })
+                });
+                const result = await res.json();
+                alert(result.message || "تم التسجيل بنجاح");
+                document.getElementById('att-student-ids').value = ""; document.getElementById('prog-notes').value = "";
+                document.getElementById('teacher-list-upward').classList.remove('show');
+                fetchDashboard();
+            } catch (e) { alert("حدث خطأ أثناء إرسال البيانات."); }
+            showLoader(false);
+        }
+
+        async function submitManualLeave() {
+            const name = document.getElementById('manual-teacher-name').value;
+            const date = document.getElementById('manual-leave-date').value;
+            const type = document.getElementById('manual-leave-type').value;
+            if (!name || !date) return alert("يرجى إكمال البيانات");
+            showLoader(true);
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addManualLeave', adminRole: 'Admin', teacherName: name, leaveDate: date, leaveType: type }) });
+                const result = await res.json();
+                alert(result.message || "تم تسجيل الإجازة بنجاح"); closeModal('admin-leave-modal'); fetchDashboard();
+            } catch (e) { alert("حدث خطأ في التسجيل"); } showLoader(false);
+        }
+
+        async function submitLeaveRequest() {
+            const date = document.getElementById('req-leave-date').value;
+            const type = document.getElementById('req-leave-type').value;
+            if (!date) return alert("اختر تاريخ الإجازة");
+            showLoader(true);
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'requestLeave', teacherName: currentUser.name, leaveDate: date, leaveType: type })
+                });
+                alert("تم إرسال طلبك للإدارة بنجاح"); closeModal('teacher-leave-modal'); fetchDashboard();
+            } catch (e) { alert("فشل الإرسال"); } showLoader(false);
+        }
+
+        async function manageLeave(reqId, status) {
+            showLoader(true);
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'manageLeave', reqId: reqId, newStatus: status, role: currentUser.role }) });
+                fetchDashboard();
+            } catch (e) { alert("حدث خطأ"); showLoader(false); }
+        }
+         if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').then(reg => {
                 console.log('تم تسجيل ServiceWorker بنجاح');
@@ -632,11 +1521,8 @@
                 }
             });
         });
-    }
-</script>
+         }
+    </script>
 </body>
+
 </html>
-
-
-
-
