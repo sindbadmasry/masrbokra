@@ -1482,6 +1482,22 @@ function openTeacherProfileModal(teacherObj) {
                 alert("تم إرسال طلبك للإدارة بنجاح"); closeModal('teacher-leave-modal'); fetchDashboard();
             } catch (e) { alert("فشل الإرسال"); } showLoader(false);
         }
+function openMyInfo() {
+    // التأكد من وجود بيانات محملة
+    if (!dashboardData || !dashboardData.data || !dashboardData.data.teachersReport) {
+        return alert("جاري تحميل البيانات، يرجى المحاولة بعد لحظات...");
+    }
+
+    // البحث عن سجل المدرس الحالي داخل تقرير المدرسين
+    const myData = dashboardData.data.teachersReport.find(t => t.name === currentUser.name);
+
+    if (myData) {
+        // استدعاء الدالة الموجودة مسبقاً لعرض المودال
+        openTeacherProfileModal(myData);
+    } else {
+        alert("عذراً، لم يتم العثور على إحصائيات خاصة بك في الفترة المحددة.");
+    }
+}
 
         async function manageLeave(reqId, status) {
             showLoader(true);
