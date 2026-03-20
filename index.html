@@ -28,7 +28,7 @@
   --doc-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Tajawal', sans-serif; }
-body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1.6; padding-bottom: 80px; }
+body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1.6; padding-bottom: 80px; overflow-x: hidden; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
@@ -44,61 +44,65 @@ body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1
 .input-field:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
 
 @media print {
-    /* إخفاء الهيدر والفوتر (الشريط الأعلى والأسفل) */
-    header, footer, .nav-bar, .bottom-nav { 
-        display: none !important; 
-    }
+    header, footer, .nav-bar, .bottom-nav { display: none !important; }
+    .no-print, #print-btn, .action-buttons, button { display: none !important; }
+    .table-container { overflow: visible !important; display: block !important; }
+    tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+    p, h2, h3, .card { page-break-inside: avoid !important; break-inside: avoid !important; }
+    table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
+    @page { size: auto; margin: 15mm 10mm 15mm 10mm; }
+    .table-container, main, body { overflow: visible !important; position: static !important; background: white !important; margin: 0 !important; padding: 0 !important; }
+}
+/* حاوية تضمن عدم خروج الفلتر عن إطار الصفحة */
+.quick-filters-wrapper {
+  width: 100%;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
 
-    /* إخفاء أزرار التحكم (الطباعة وإنشاء التقارير) */
-    .no-print, #print-btn, .action-buttons, button {
-        display: none !important;
-    }
+/* الجسم الرئيسي للفلتر - توزيع مرن */
+.segmented-control {
+  display: flex;
+  background: #f1f5f9; /* رمادي فاتح للخلفية */
+  padding: 4px;
+  border-radius: 14px;
+  gap: 2px;
+  width: 100%;
+}
 
-    /* إلغاء خاصية التجاوب في الجداول لضمان ظهورها كاملة وبخط سليم */
-    .table-container {
-        overflow: visible !important;
-        display: block !important;
-        /* 1. منع انقسام صفوف الجدول بين صفحتين */
-    tr {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-    }
+/* العنصر الفردي (الزر) */
+.control-item {
+  flex: 1; /* يضمن توزيع الـ 5 أزرار بالتساوي تماماً */
+  display: flex;
+  flex-direction: column; /* الأيقونة فوق النص لتوفير العرض */
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 11px;
+  transition: all 0.3s ease;
+}
 
-    /* 2. منع انقسام الفقرات أو النصوص الطويلة */
-    p, h2, h3, .card {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-    }
+.control-item i {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
 
-    /* 3. إجبار الجدول على البدء من بداية الصفحة إذا كان سيُقطع */
-    table {
-        page-break-inside: auto;
-    }
+.control-item span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+  white-space: nowrap;
+}
 
-    /* 4. حل مشكلة اختفاء الهوامش (توسيط المحتوى) */
-    @page {
-        size: auto;
-        margin: 15mm 10mm 15mm 10mm; /* ضبط هوامش الصفحة (أعلى، يمين، أسفل، يسار) */
-    }
-
-    /* 5. التأكد من أن الحاوية لا تقيد العرض */
-    .table-container, main, body {
-        overflow: visible !important;
-        position: static !important; /* لمنع مشاكل العرض في بعض المتصفحات */
-    }
-    }
-    
-    table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
-
-    /* ضبط الصفحة لتكون نظيفة */
-    body {
-        background: white !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+/* حالة الزر النشط (بديل btn-primary) */
+.control-item.active {
+  background: #ffffff; /* خلفية بيضاء للزر المختار */
+  color: var(--primary); /* اللون الأزرق الأساسي للمؤسسة */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 /* الأزرار */
 .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
@@ -147,22 +151,24 @@ header { background: var(--card-bg); color: var(--text-dark); padding: 15px 20px
 .sub-tab-btn { flex: 1; padding: 12px; text-align: center; border: none; background: transparent; font-size: 14px; font-weight: 900; color: var(--text-muted); border-radius: 10px; cursor: pointer; transition: 0.3s; }
 .sub-tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); }
 .filter-tools { background: var(--bg); border-radius: 14px; padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.quick-filters { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
-.quick-filters::-webkit-scrollbar { height: 4px; }
-.quick-filters::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-.table-container { overflow-x: auto; background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); width: 100%; max-width: 100%; margin-bottom: 15px; }
-table { width: 100%; border-collapse: collapse; min-width: 500px; }
-th { background: #f8fafc; padding: 15px 12px; text-align: center; font-size: 13px; font-weight: 900; color: var(--text-dark); border-bottom: 2px solid var(--border); }
-td { padding: 14px 12px; border-bottom: 1px solid var(--border); text-align: center; font-size: 14px; font-weight: 700; white-space: normal; word-wrap: break-word; }
+
+/* التعديل لضمان بقاء الفلاتر والجداول داخل الشاشة */
+.quick-filters { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: space-between; overflow: hidden; padding: 0; width: 100%; }
+.quick-filters .btn { flex: 1 1 auto; padding: 8px 0; font-size: 12px; min-width: 18%; text-align: center; justify-content: center; border-radius: 10px;}
+
+.table-container { overflow-x: hidden; background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); width: 100%; margin-bottom: 15px; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { background: #f8fafc; padding: 12px 4px; text-align: center; font-size: 13px; font-weight: 900; color: var(--text-dark); border-bottom: 2px solid var(--border); word-wrap: break-word; }
+td { padding: 12px 4px; border-bottom: 1px solid var(--border); text-align: center; font-size: 13px; font-weight: 700; word-wrap: break-word; overflow-wrap: break-word; }
 tr:hover td { background: #f1f5f9; cursor: pointer; }
-.badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 900; }
+.badge { padding: 6px 8px; border-radius: 8px; font-size: 11px; font-weight: 900; display: inline-block; line-height: 1.2;}
 .bg-pending { background: #fef3c7; color: #d97706; }
 .bg-approved { background: #dcfce7; color: #16a34a; }
 .bg-rejected { background: #fee2e2; color: #dc2626; }
 
 /* النوافذ المنبثقة والتحميل */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-.modal-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px; border-radius: 24px; position: relative; animation: scaleIn 0.3s ease; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto; }
+.modal-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px; border-radius: 24px; position: relative; animation: scaleIn 0.3s ease; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto; overflow-x: hidden; }
 .close-modal { position: absolute; top: 15px; left: 15px; width: 35px; height: 35px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-dark); cursor: pointer; transition: 0.2s; }
 .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); display: none; align-items: center; justify-content: center; z-index: 9999; }
 .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -181,9 +187,9 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .report-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 25px 0; }
 .report-stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03);}
 .report-stat-card .rp-value { font-size: 28px; font-weight: 900; color: var(--primary); display: block;}
-.report-table { width: 100%; border-collapse: collapse; margin: 0; font-size: 14px; table-layout: auto; }
-.report-table th { background: #f1f5f9; color: var(--text-dark); font-weight: 800; padding: 12px; border: 1px solid var(--border); text-align: center;}
-.report-table td { padding: 12px; border: 1px solid var(--border); text-align: center; font-weight: 600; color: #334155; vertical-align: middle;}
+.report-table { width: 100%; border-collapse: collapse; margin: 0; font-size: 14px; table-layout: fixed; }
+.report-table th { background: #f1f5f9; color: var(--text-dark); font-weight: 800; padding: 8px 4px; border: 1px solid var(--border); text-align: center; word-wrap: break-word;}
+.report-table td { padding: 8px 4px; border: 1px solid var(--border); text-align: center; font-weight: 600; color: #334155; vertical-align: middle; word-wrap: break-word;}
 .report-image-placeholder { width: 150px; height: 150px; border: 3px dashed var(--secondary); border-radius: 15px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; flex: 0 0 auto;}
 .report-image-placeholder:hover { background: #e0f2fe; border-color: var(--primary); }
 .report-image-placeholder i { font-size: 30px; color: var(--secondary); margin-bottom: 8px; }
@@ -197,6 +203,13 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .pdf-mode::before { display: none !important; }
 .pdf-mode button, .pdf-mode .report-image-placeholder i, .pdf-mode .report-image-placeholder span { display: none !important; }
 .pdf-mode .report-image-placeholder { border: 1px solid #ccc !important; }
+
+/* تنسيق صور المدرس والطالب داخل المودال */
+.student-modal-header { text-align: center; margin-bottom: 15px; }
+.student-modal-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin: 0 auto 10px; display: block; background-color: #f1f5f9; }
+.student-modal-name { margin: 0; font-size: 18px; color: var(--text-dark); }
+.student-modal-code { font-size: 14px; color: var(--text-muted); font-weight: bold; }
+
 </style>
 </head>
 <body>
@@ -306,19 +319,37 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
       <div id="sub-view-students" class="sub-view">
         <div class="card">
           <div class="card-title"><i class="fas fa-users"></i> إحصائيات الطلاب</div>
-          <div class="quick-filters" id="student-filters-container">
-            <button class="btn btn-primary" id="filter-all" onclick="filterStudents('all')">الكل</button>
-            <button class="btn btn-outline" id="filter-morning" onclick="filterStudents('صباحي')">صباحي <i class="fas fa-sun" style="color:#eab308"></i></button>
-            <button class="btn btn-outline" id="filter-evening" onclick="filterStudents('مسائي')">مسائي <i class="fas fa-moon" style="color:#6366f1"></i></button>
-            <button class="btn btn-outline" id="filter-top" onclick="filterStudents('top')">الأكثر حضوراً <i class="fas fa-trophy" style="color:#f59e0b"></i></button>
-          </div>
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="student-search" class="input-field" placeholder="ابحث بالاسم أو الكود..." onkeyup="renderStudentsTable()">
+         <div class="quick-filters-wrapper">
+  <div class="segmented-control" id="student-filters-container">
+    <button class="control-item active" id="filter-all" onclick="toggleStudentFilter('all')">
+      <i class="fas fa-border-all"></i>
+      <span>الكل</span>
+    </button>
+    <button class="control-item" id="filter-morning" onclick="toggleStudentFilter('صباحي')">
+      <i class="fas fa-sun"></i>
+      <span>صباحي</span>
+    </button>
+    <button class="control-item" id="filter-evening" onclick="toggleStudentFilter('مسائي')">
+      <i class="fas fa-moon"></i>
+      <span>مسائي</span>
+    </button>
+    <button class="control-item" id="filter-cadres" onclick="toggleStudentFilter('كوادر')">
+      <i class="fas fa-user-graduate"></i>
+      <span>كوادر</span>
+    </button>
+    <button class="control-item" id="filter-top" onclick="toggleStudentFilter('top')">
+      <i class="fas fa-crown"></i>
+      <span>الاكثر حضورا</span>
+    </button>
+  </div>
+</div>
+          <div class="search-box" style="position: relative; margin-bottom: 15px;">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted);"></i>
+            <input type="text" id="student-search" class="input-field" style="padding-right: 40px;" placeholder="ابحث بالاسم أو الكود..." onkeyup="renderStudentsTable()">
           </div>
           <div class="table-container">
             <table id="table-students">
-              <thead><tr><th>الكود</th><th>الاسم (والفترة)</th><th>أيام الحضور</th></tr></thead>
+              <thead><tr><th>الكود</th><th>الاسم (والفترة)</th><th>الحضور</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -340,9 +371,9 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
       <div id="sub-view-teachers" class="sub-view" style="display:none;">
         <div class="card">
           <div class="card-title"><i class="fas fa-chalkboard-teacher"></i> كشف المدرسين</div>
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="teacher-search" class="input-field" placeholder="ابحث باسم المدرس..." onkeyup="filterTable('teacher-search', 'table-teachers-report')">
+          <div class="search-box" style="position: relative; margin-bottom: 15px;">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 16px; color: var(--text-muted);"></i>
+            <input type="text" id="teacher-search" class="input-field" style="padding-right: 40px;" placeholder="ابحث باسم المدرس..." onkeyup="filterTable('teacher-search', 'table-teachers-report')">
           </div>
           <div class="table-container">
             <table id="table-teachers-report">
@@ -364,10 +395,19 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
         </button>
       </div>
       <div class="card">
-        <div class="card-title"><i class="fas fa-history"></i> سجل الطلبات والإجازات</div>
+        <div class="card-title"><i class="fas fa-hourglass-half"></i> الطلبات الجارية</div>
         <div class="table-container">
-          <table id="table-leaves">
-            <thead><tr><th>المدرس</th><th>التاريخ</th><th>النوع</th><th>الحالة</th><th>إجراء</th></tr></thead>
+          <table id="table-leaves-pending">
+            <thead><tr><th>المدرس</th><th>التاريخ</th><th>النوع</th><th>إجراء</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-history"></i> سجل الإجازات المنتهية</div>
+        <div class="table-container">
+          <table id="table-leaves-history">
+            <thead><tr><th>المدرس</th><th>التاريخ</th><th>النوع</th><th>الحالة</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -440,11 +480,22 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
       </select>
     </div>
     <div class="input-group">
-      <label>الأنشطة المنفذة / المستويات (متعدد)</label>
+      <label>الأنشطة المنفذة (موجودة مسبقاً)</label>
       <div class="multi-select" id="perf-keywords">
         <p style="font-size:13px; color:var(--text-muted);">يرجى اختيار البرنامج أولاً لظهور الأنشطة.</p>
       </div>
     </div>
+    
+    <div style="margin-top: 20px; border-top: 2px dashed var(--border); padding-top: 15px;">
+        <label style="font-size: 13px; font-weight: bold; color: var(--info); display: block; margin-bottom: 10px;"><i class="fas fa-plus"></i> إضافة نشاط غير موجود بالقائمة</label>
+        <div class="input-group">
+            <input type="text" id="perf-new-activity" class="input-field" placeholder="اكتب اسم النشاط الجديد هنا...">
+        </div>
+        <div class="input-group">
+            <input type="text" id="perf-new-level" class="input-field" placeholder="المستوى (مثال: مستوى أول، متقدم...)">
+        </div>
+    </div>
+
     <button class="btn btn-warning" onclick="submitPerformanceData()" style="margin-top: 15px;">
       تسجيل الإنجاز <i class="fas fa-save"></i>
     </button>
@@ -516,10 +567,10 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3YVEBMwy7TTpxb611aostBRe5SKuxn4Bgm1akU_zAx1SVxb_Slt5kPFoGJAbGrbkWWA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGC3ZvIvrolUlIwCdsyl19Z_VNAo5WUH8Xo2lZx5N5FPLf9_Fmj8Wd9X1KFVw8yGXQoA/exec";
 let currentUser = JSON.parse(localStorage.getItem('mb_user')) || null;
 let dashboardData = null;
-let currentStudentFilter = 'all';
+let activeStudentFilters = new Set(['all']); // لدعم الاختيار المتعدد
 
 const PROGRAMS_LIST = [
   { name: "تعليم", icon: "fa-book-reader", color: "#3b82f6" }, { name: "كمبيوتر", icon: "fa-laptop", color: "#8b5cf6" },
@@ -636,14 +687,34 @@ function renderUI(d) {
   if (currentUser.role === 'Admin' && d.teachersReport) {
     document.querySelector('#table-teachers-report tbody').innerHTML = d.teachersReport.map(t => `<tr onclick='openTeacherProfileModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'><td style="font-weight:800; color: var(--info);"><i class="fas fa-user-circle"></i> ${t.name}</td><td style="color:var(--success); font-weight:900;">${t.presentDays || 0}</td><td style="color:var(--danger); font-weight:900;">${t.absentDays || 0}</td><td style="color:var(--warning); font-weight:900;">${t.leaveDays || 0}</td></tr>`).join('');
   }
-  const leaves = currentUser.role === 'Admin' ? (d.pendingLeaves || []) : (d.myLeaves || []);
-  document.querySelector('#table-leaves tbody').innerHTML = leaves.map(l => {
-    const statusClass = l.status === 'Pending' ? 'bg-pending' : (l.status === 'Approved' ? 'bg-approved' : 'bg-rejected');
-    const statusAr = l.status === 'Pending' ? 'قيد الانتظار' : (l.status === 'Approved' ? 'مقبول' : 'مرفوض');
+  
+  // دمج وتوزيع الإجازات في الجدولين الجديدين لجميع المستخدمين
+  let allLeavesToProcess = [];
+  if (currentUser.role === 'Admin') {
+    allLeavesToProcess = [...(d.pendingLeaves || []), ...(d.allLeaves || d.myLeaves || [])];
+    const uniqueIds = new Set();
+    allLeavesToProcess = allLeavesToProcess.filter(l => { if(uniqueIds.has(l.id)) return false; uniqueIds.add(l.id); return true; });
+  } else {
+    allLeavesToProcess = d.myLeaves || [];
+  }
+
+  const pendingLeaves = allLeavesToProcess.filter(l => l.status === 'Pending');
+  const historyLeaves = allLeavesToProcess.filter(l => l.status !== 'Pending');
+
+  document.querySelector('#table-leaves-pending tbody').innerHTML = pendingLeaves.map(l => {
     let actions = '-';
-    if (currentUser.role === 'Admin' && l.status === 'Pending') { actions = `<div style="display:flex; justify-content:center; gap:10px;"><button onclick="manageLeave('${l.id}', 'Approved')" style="color:var(--success); border:none; background:none; font-size:22px; cursor:pointer;"><i class="fas fa-check-circle"></i></button><button onclick="manageLeave('${l.id}', 'Rejected')" style="color:var(--danger); border:none; background:none; font-size:22px; cursor:pointer;"><i class="fas fa-times-circle"></i></button></div>`; }
+    if (currentUser.role === 'Admin') {
+      actions = `<div style="display:flex; justify-content:center; gap:8px;"><button onclick="manageLeave('${l.id}', 'Approved')" style="color:var(--success); border:none; background:none; font-size:20px; cursor:pointer;"><i class="fas fa-check-circle"></i></button><button onclick="manageLeave('${l.id}', 'Rejected')" style="color:var(--danger); border:none; background:none; font-size:20px; cursor:pointer;"><i class="fas fa-times-circle"></i></button></div>`;
+    }
     const displayDate = isNaN(new Date(l.date)) ? l.date.split('T')[0] : new Date(l.date).toLocaleDateString('ar-EG');
-    return `<tr><td style="font-weight:700;">${l.teacher || currentUser.name}</td><td>${displayDate}</td><td>${l.type || 'إجازة'}</td><td><span class="badge ${statusClass}">${statusAr}</span></td><td>${actions}</td></tr>`;
+    return `<tr><td style="font-weight:700;">${l.teacher || currentUser.name}</td><td>${displayDate}</td><td>${l.type || 'إجازة'}</td><td>${actions}</td></tr>`;
+  }).join('');
+
+  document.querySelector('#table-leaves-history tbody').innerHTML = historyLeaves.map(l => {
+    const statusClass = l.status === 'Approved' ? 'bg-approved' : 'bg-rejected';
+    const statusAr = l.status === 'Approved' ? 'مقبول' : 'مرفوض';
+    const displayDate = isNaN(new Date(l.date)) ? l.date.split('T')[0] : new Date(l.date).toLocaleDateString('ar-EG');
+    return `<tr><td style="font-weight:700;">${l.teacher || currentUser.name}</td><td>${displayDate}</td><td>${l.type || 'إجازة'}</td><td><span class="badge ${statusClass}">${statusAr}</span></td></tr>`;
   }).join('');
 }
 
@@ -672,13 +743,12 @@ async function generateAnalyticalReport(excludeAdmin = false) {
   reportHTML += `</div>`;
   reportHTML += getImageSectionHTML('kpi');
 
-  // 1. تقرير الكوادر
   const cadres = students.filter(s => (s.name && s.name.includes('كادر')) || (s.shift && s.shift.includes('كادر')));
   reportHTML += `<h2><i class="fas fa-star"></i> تقرير الكوادر (قادة المستقبل)</h2>`;
   if (cadres.length > 0) {
     reportHTML += `<p>إجمالي عدد الكوادر المشاركة: <strong>${cadres.length}</strong> كادر.</p>`;
     const topCadres = [...cadres].sort((a,b) => (b.days||0) - (a.days||0));
-    reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th>الترتيب</th><th>اسم الكادر</th><th>أيام الحضور</th><th>البرامج المشارك فيها</th></tr></thead><tbody>`;
+    reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th style="width:15%">ترتيب</th><th>اسم الكادر</th><th style="width:20%">حضور</th><th style="width:30%">البرامج</th></tr></thead><tbody>`;
     topCadres.forEach((c, idx) => {
       let isTop = idx < 3;
       let rowStyle = isTop ? 'background: #fffbeb; font-weight: bold;' : '';
@@ -690,7 +760,6 @@ async function generateAnalyticalReport(excludeAdmin = false) {
   } else { reportHTML += `<p style="color:var(--text-muted);">لا توجد بيانات كوادر مسجلة في هذه الفترة.</p>`; }
   reportHTML += getImageSectionHTML('cadres');
 
-  // 2. تحليل الأداء الطلابي العام
   const topStudents = [...students].sort((a, b) => (b.days || 0) - (a.days || 0)).slice(0, 3);
   reportHTML += `<h2><i class="fas fa-user-graduate"></i> تحليل الأداء الطلابي العام</h2>`;
   if (topStudents.length > 0) {
@@ -700,7 +769,6 @@ async function generateAnalyticalReport(excludeAdmin = false) {
   }
   reportHTML += getImageSectionHTML('students');
 
-  // 3. الأداء الإداري والتدريس
   if (!excludeAdmin) {
     reportHTML += `<h2><i class="fas fa-chalkboard-teacher"></i> الأداء الإداري والتدريس</h2>`;
     if (teachers.length > 0) {
@@ -711,69 +779,102 @@ async function generateAnalyticalReport(excludeAdmin = false) {
     reportHTML += getImageSectionHTML('teachers');
   }
 
-  // 4. المشهد الفني (الجدول المدمج الجديد)
-  reportHTML += `<h2><i class="fas fa-chart-line"></i>التقرير الفني ( البرامج )</h2>`;
-  let activeSettings = settings.filter(s => s.count > 0);
-  
-  if (activeSettings.length > 0) {
-    // تجهيز الداتا لاستخراج المدرسين والطلاب الفريدين لكل برنامج
-    let progTeachers = {}; let progStudentsUnique = {}; let progSettingsMap = {};
+  // الجدول المعدل للبرامج مع عمود المستوى وإخفاء المدرسين
+ reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
+let activeSettings = settings.filter(s => s.count > 0);
+
+if (activeSettings.length > 0) {
+    let progTeachers = {}; let progStudentsUnique = {}; 
     
-    teachers.forEach(t => { 
-      Object.keys(t.programs || {}).forEach(p => { 
-        if(!progTeachers[p]) progTeachers[p] = new Set(); 
-        progTeachers[p].add(t.name); 
-      }); 
+    // تجميع البيانات الأساسية
+    teachers.forEach(t => { Object.keys(t.programs || {}).forEach(p => { if(!progTeachers[p]) progTeachers[p] = new Set(); progTeachers[p].add(t.name); }); });
+    students.forEach(s => { (s.programs || []).forEach(p => { if(!progStudentsUnique[p]) progStudentsUnique[p] = new Set(); progStudentsUnique[p].add(s.id); }); });
+
+    // هيكلة البيانات: تجميع حسب البرنامج ثم المستوى لضمان دمج الصفوف بشكل صحيح
+    let structuredMap = {};
+    activeSettings.forEach(s => {
+        if (!structuredMap[s.program]) structuredMap[s.program] = {};
+        let lvlName = s.level || 'عام';
+        if (!structuredMap[s.program][lvlName]) structuredMap[s.program][lvlName] = [];
+        structuredMap[s.program][lvlName].push(s);
     });
-    
-    students.forEach(s => { 
-      (s.programs || []).forEach(p => { 
-        if(!progStudentsUnique[p]) progStudentsUnique[p] = new Set();
-        progStudentsUnique[p].add(s.id); 
-      }); 
+
+    // إنشاء الجدول مع تحديد عرض الأعمدة (النشاط المنفذ 50%)
+    reportHTML += `
+    <div class="table-container">
+        <table class="report-table" style="table-layout: fixed; width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width:12%">البرنامج</th>
+                    <th style="width:10%">المستوى</th>
+                    <th style="width:50%">النشاط المنفذ</th>
+                    ${!excludeAdmin ? '<th style="width:15%">المدرسين</th>' : ''}
+                    <th style="width:13%">المستفيدين</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    Object.keys(structuredMap).forEach(progName => {
+        let levelsGroup = structuredMap[progName];
+        let levelNames = Object.keys(levelsGroup);
+        
+        // حساب إجمالي الصفوف للبرنامج (لدمج عمود البرنامج والمدرسين والمستفيدين)
+        let totalProgRows = 0;
+        levelNames.forEach(l => totalProgRows += levelsGroup[l].length);
+
+        let isFirstRowOfProg = true;
+
+        levelNames.forEach(lvlName => {
+            let activities = levelsGroup[lvlName];
+            let levelRowSpan = activities.length; // عدد الصفوف لهذا المستوى
+            
+            activities.forEach((activity, actIdx) => {
+                reportHTML += `<tr>`;
+
+                // 1. عمود البرنامج (يدمج على مستوى البرنامج بالكامل)
+                if (isFirstRowOfProg) {
+                    reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:900; background:#f8fafc; text-align:center; vertical-align:middle;">${progName}</td>`;
+                }
+
+                // 2. عمود المستوى (يدمج إذا تكرر داخل نفس البرنامج)
+                if (actIdx === 0) {
+                    reportHTML += `<td rowspan="${levelRowSpan}" style="font-weight:bold; color:var(--info); text-align:center; vertical-align:middle; background:#fff;">${lvlName}</td>`;
+                }
+
+                // 3. عمود النشاط المنفذ (يأخذ 50% من المساحة)
+                reportHTML += `<td style="text-align:right; padding:8px; line-height:1.4;">
+                    ${activity.keyword} <span style="color:var(--text-muted); font-size:11px;">(${activity.count})</span>
+                </td>`;
+
+                // 4. أعمدة المدرسين والمستفيدين (تدمج على مستوى البرنامج بالكامل)
+                if (isFirstRowOfProg) {
+                    let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join("، ") : "غير محدد";
+                    let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
+
+                    if (!excludeAdmin) {
+                        reportHTML += `<td rowspan="${totalProgRows}" style="font-size:12px; vertical-align:middle;">${teachersList}</td>`;
+                    }
+                    reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:bold; color:var(--primary); text-align:center; vertical-align:middle;">${uniqueBenCount}</td>`;
+                }
+
+                reportHTML += `</tr>`;
+                isFirstRowOfProg = false; // تم رندر أول صف في البرنامج
+            });
+        });
     });
-    
-    activeSettings.forEach(s => { 
-      if(!progSettingsMap[s.program]) progSettingsMap[s.program] = []; 
-      progSettingsMap[s.program].push(s); 
-    });
-    
-    reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th>البرنامج</th><th>النشاط المنفذ </th><th>المدرسين </th><th>المستفيدين</th></tr></thead><tbody>`;
-    
-    Object.keys(progSettingsMap).forEach(progName => {
-      let levels = progSettingsMap[progName]; 
-      let rowSpan = levels.length;
-      let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join("، ") : "غير محدد";
-      let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
-      
-      levels.forEach((lvl, idx) => {
-        reportHTML += `<tr>`;
-        if (idx === 0) reportHTML += `<td rowspan="${rowSpan}" style="font-weight:900; background:#f8fafc; font-size:16px;">${progName}</td>`;
-        reportHTML += `<td>${lvl.keyword} <span style="color:var(--text-muted); font-size:12px;">(${lvl.count} مرة)</span></td>`;
-        if (idx === 0) { 
-          reportHTML += `<td rowspan="${rowSpan}">${teachersList}</td>`;
-          reportHTML += `<td rowspan="${rowSpan}" style="font-weight:bold; color:var(--primary); font-size:16px;">${uniqueBenCount} طالب</td>`; 
-        }
-        reportHTML += `</tr>`;
-      });
-    });
+
     reportHTML += `</tbody></table></div>`;
-  } else { 
-    reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`; 
-  }
+} else {
+    reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`;
+}
   reportHTML += getImageSectionHTML('programs');
 
-  // 5. التوصيات
   reportHTML += `<h2><i class="fas fa-lightbulb"></i> التوصيات والملاحظات الإدارية والفنية</h2>`;
   const notesData = d.notes || []; 
   let validNotes = notesData.filter(n => n && n.trim() !== "");
   if(validNotes.length > 0) {
-    reportHTML += `<ul>`; 
-    validNotes.forEach(note => { reportHTML += `<li>${note}</li>`; }); 
-    reportHTML += `</ul>`;
-  } else { 
-    reportHTML += `<p style="color:var(--text-muted);">لم يتم تدوين أي توصيات في سجلات الحضور لهذه الفترة.</p>`; 
-  }
+    reportHTML += `<ul>`; validNotes.forEach(note => { reportHTML += `<li>${note}</li>`; }); reportHTML += `</ul>`;
+  } else { reportHTML += `<p style="color:var(--text-muted);">لم يتم تدوين أي توصيات في سجلات الحضور لهذه الفترة.</p>`; }
 
   document.getElementById('ai-loading').style.display = 'none';
   document.getElementById('smart-report-content').innerHTML = reportHTML;
@@ -814,31 +915,88 @@ function renderKeywords() {
   const prog = document.getElementById('perf-program').value; const kwContainer = document.getElementById('perf-keywords');
   if(!prog) { kwContainer.innerHTML = '<p style="font-size:13px; color:var(--text-muted);">يرجى اختيار البرنامج أولاً لظهور الأنشطة.</p>'; return; }
   const kws = dashboardData.data.settings.filter(s => s.program === prog);
-  if(kws.length === 0) { kwContainer.innerHTML = '<p style="font-size:13px; color:var(--text-muted);">لا توجد كلمات مفتاحية مسجلة لهذا البرنامج.</p>'; return; }
+  if(kws.length === 0) { kwContainer.innerHTML = '<p style="font-size:13px; color:var(--text-muted);">لا توجد أنشطة مسجلة. يمكنك إضافتها يدوياً بالأسفل.</p>'; return; }
   kwContainer.innerHTML = kws.map(k => `<div class="chip" onclick="toggleChip(this)" data-val="${k.keyword}">${k.keyword}</div>`).join('');
 }
+
 async function submitPerformanceData() {
   const date = document.getElementById('perf-date').value; const prog = document.getElementById('perf-program').value;
-  const chips = document.querySelectorAll('#perf-keywords .chip.selected'); const keywords = Array.from(chips).map(c => c.getAttribute('data-val'));
-  if(!date || !prog || keywords.length === 0) return alert("يرجى اختيار البرنامج واختيار نشاط واحد على الأقل.");
+  const chips = document.querySelectorAll('#perf-keywords .chip.selected'); 
+  const keywords = Array.from(chips).map(c => c.getAttribute('data-val'));
+  const newActivity = document.getElementById('perf-new-activity').value.trim();
+  const newLevel = document.getElementById('perf-new-level').value.trim();
+
+  if(!date || !prog) return alert("يرجى اختيار التاريخ والبرنامج.");
+  if(keywords.length === 0 && !newActivity) return alert("يرجى اختيار نشاط من القائمة أو إدخال نشاط جديد يدوياً.");
+
   showLoader(true);
-  try { await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'submitPerformance', date: date, teacherName: currentUser.name, program: prog, keywords: keywords }) }); alert("تم الحفظ بنجاح"); closeModal('performance-modal'); fetchDashboard(); } catch (e) { alert("حدث خطأ."); }
+  try { 
+      await fetch(SCRIPT_URL, { 
+          method: 'POST', 
+          body: JSON.stringify({ 
+              action: 'submitPerformance', 
+              date: date, 
+              teacherName: currentUser.name, 
+              program: prog, 
+              keywords: keywords,
+              newActivity: newActivity,
+              newLevel: newLevel
+          }) 
+      }); 
+      alert("تم الحفظ بنجاح"); 
+      document.getElementById('perf-new-activity').value = "";
+      document.getElementById('perf-new-level').value = "";
+      closeModal('performance-modal'); 
+      fetchDashboard(); 
+  } catch (e) { alert("حدث خطأ."); }
   showLoader(false);
 }
 
-// دالة استخراج PDF مطورة لا تقص المحتوى 
-function exportToPDF() {
-    // كل ما نحتاجه هو استدعاء أمر الطباعة
-    // المتصفح سيقوم تلقائياً بتطبيق قواعد @media print أعلاه
-    window.print();
+function exportToPDF() { window.print(); }
 
-}
+// دالة الفلترة المتعددة
+function toggleStudentFilter(type) {
+  // 1. إدارة منطق الفلاتر (Logic)
+  if (type === 'all') {
+    activeStudentFilters.clear();
+    activeStudentFilters.add('all');
+  } else {
+    activeStudentFilters.delete('all');
+    if (activeStudentFilters.has(type)) {
+      activeStudentFilters.delete(type);
+      // إذا أصبحت القائمة فارغة، نعود لتفعيل "الكل" تلقائياً
+      if (activeStudentFilters.size === 0) activeStudentFilters.add('all');
+    } else {
+      activeStudentFilters.add(type);
+    }
+  }
 
-function filterStudents(type) {
-  currentStudentFilter = type;
-  document.querySelectorAll('#student-filters-container .btn').forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-outline'); });
-  document.getElementById('filter-' + (type === 'صباحي' ? 'morning' : type === 'مسائي' ? 'evening' : type === 'top' ? 'top' : 'all')).classList.replace('btn-outline', 'btn-primary');
-  renderStudentsTable();
+  // 2. تحديث الواجهة (UI) - تعديل الكلاسات بدقة
+  // إزالة كلاس active من جميع أزرار الحاوية
+  const container = document.getElementById('student-filters-container');
+  if (container) {
+    container.querySelectorAll('.control-item').forEach(btn => {
+      btn.classList.remove('active');
+    });
+  }
+
+  // 3. إضافة كلاس active للأزرار المختارة بناءً على الـ Set
+  activeStudentFilters.forEach(f => {
+    let idSuffix = (f === 'صباحي' ? 'morning' : 
+                    f === 'مسائي' ? 'evening' : 
+                    f === 'كوادر' ? 'cadres' : 
+                    f === 'top' ? 'top' : 'all');
+    
+    let targetBtn = document.getElementById('filter-' + idSuffix);
+    if (targetBtn) {
+      targetBtn.classList.add('active');
+    }
+  });
+
+  // 4. إعادة رندر الجدول لتطبيق الفلترة
+  if (typeof renderStudentsTable === "function") {
+    renderStudentsTable();
+  }
 }
 
 function renderStudentsTable() {
@@ -846,11 +1004,24 @@ function renderStudentsTable() {
   const term = document.getElementById('student-search').value.toLowerCase();
   let filtered = (dashboardData.data.students || []).filter(s => {
     let matchSearch = (s.name || '').toLowerCase().includes(term) || (s.id || '').toString().includes(term);
-    let matchType = true;
-    if (currentStudentFilter === 'صباحي') matchType = s.shift === 'صباحي'; else if (currentStudentFilter === 'مسائي') matchType = s.shift === 'مسائي';
-    return matchSearch && matchType;
+    if (!matchSearch) return false;
+    
+    if (activeStudentFilters.has('all')) return true;
+
+    let matchShift = false;
+    if (activeStudentFilters.has('صباحي') && s.shift === 'صباحي') matchShift = true;
+    if (activeStudentFilters.has('مسائي') && s.shift === 'مسائي') matchShift = true;
+    
+    let matchCadre = false;
+    if (activeStudentFilters.has('كوادر') && ((s.name && s.name.includes('كادر')) || (s.shift && s.shift.includes('كادر')))) matchCadre = true;
+
+    let hasCondition = activeStudentFilters.has('صباحي') || activeStudentFilters.has('مسائي') || activeStudentFilters.has('كوادر');
+    
+    if (hasCondition) { return matchShift || matchCadre; }
+    return true; 
   });
-  if (currentStudentFilter === 'top') { filtered.sort((a, b) => b.days - a.days); }
+
+  if (activeStudentFilters.has('top')) { filtered.sort((a, b) => b.days - a.days); }
   document.querySelector('#table-students tbody').innerHTML = filtered.map(s => `<tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'><td style="font-weight:900; color:var(--primary)">${s.id}</td><td style="font-weight:700;">${s.name} <br><span style="font-size:11px; color:var(--text-muted);">${s.shift}</span></td><td><span class="badge bg-approved" style="font-size:13px;">${s.days} يوم</span></td></tr>`).join('');
 }
 
