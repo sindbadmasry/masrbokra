@@ -197,6 +197,54 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .uploaded-report-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 10;}
 .ai-loader { display: none; text-align: center; padding: 40px 20px; }
 .ai-loader i { color: var(--primary); font-size: 40px; animation: spin 2s linear infinite; margin-bottom: 15px; }
+/* تنسيق زر التبديل المطور */
+.toggle-switch {
+  position: relative;
+  width: 45px;
+  height: 24px;
+}
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #cbd5e1;
+  transition: .4s;
+  border-radius: 24px;
+}
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .switch-slider { background-color: var(--primary); }
+input:checked + .switch-slider:before { transform: translateX(21px); }
+
+/* إخفاء أزرار التعديل وأدوات التحكم عند الطباعة */
+@media print {
+  .no-print, .btn-outline, .btn-success, .image-upload-section {
+    display: none !important;
+  }
+  [contenteditable="true"] {
+    border: none !important;
+    background: transparent !important;
+  }
+}
+
+/* تحسين شكل الزر داخل التقرير */
+.btn-outline {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    transition: 0.2s;
+}
+.btn-outline:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
 
 /* إعدادات الطباعة و PDF */
 .pdf-mode { padding: 15px !important; box-shadow: none !important; border: none !important; max-width: 100% !important; }
