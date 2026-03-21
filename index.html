@@ -428,11 +428,11 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
 
     <div id="view-general" class="view" style="display:none;">
       <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-        <button class="btn btn-ai" onclick="generateAnalyticalReport(false)" style="flex: 1; min-width: 140px; font-size:14px;">
+        <button class="btn btn-ai" onclick="generateAnalyticalReport()" style="flex: 1; min-width: 140px; font-size:14px;">
           إنشاء التقرير الشامل <i class="fas fa-file-contract"></i>
         </button>
-        <button class="btn btn-outline" onclick="generateAnalyticalReport(true)" style="flex: 1; min-width: 140px; border-color: var(--primary); color: var(--primary); font-size:14px; font-weight:900;">
-          تقرير (بدون المدرسين) <i class="fas fa-file-alt"></i>
+        <button class="btn btn-outline" onclick="openReportFilterModal()" style="flex: 1; min-width: 140px; border-color: var(--primary); color: var(--primary); font-size:14px; font-weight:900;">
+          تخصيص التقرير <i class="fas fa-filter"></i>
         </button>
         <button class="btn btn-danger" onclick="exportToPDF()" style="width: auto; font-size:14px;" title="تصدير PDF">
           تصدير PDF <i class="fas fa-file-pdf"></i>
@@ -442,7 +442,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
       <div id="report-controls" class="controls-bar no-print" style="display: none;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <label class="toggle-switch">
-            <input type="checkbox" id="narrative-toggle" onchange="generateAnalyticalReport(window.lastExcludeAdmin)">
+            <input type="checkbox" id="narrative-toggle" onchange="generateAnalyticalReport()">
             <span class="switch-slider"></span>
           </label>
           <span style="font-weight: 800; font-size: 14px; color: var(--text-dark);">عرض سردي للبرامج</span>
@@ -588,6 +588,22 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
     <div class="input-group" style="margin-top: 20px;"><label>التاريخ</label><input type="date" id="req-leave-date" class="input-field"></div>
     <div class="input-group"><label>النوع</label><select id="req-leave-type" class="input-field"><option value="اعتيادي">اعتيادي</option><option value="عارضة">عارضة</option></select></div>
     <button class="btn btn-primary" style="margin-top: 15px;" onclick="submitLeaveRequest()">إرسال الطلب للإدارة <i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<div class="modal" id="report-filter-modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeModal('report-filter-modal')"><i class="fas fa-times"></i></span>
+    <h3 style="margin-top: 0; color: var(--text-dark); border-bottom: 2px solid var(--bg); padding-bottom: 15px;"><i class="fas fa-filter text-primary"></i> تخصيص التقرير (إخفاء الأقسام)</h3>
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; font-weight: bold; color: var(--text-dark); font-size: 15px; text-align: right;">
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-kpi" style="width: 18px; height: 18px;"> لوحة مؤشرات الأداء الرئيسية</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-cadres" style="width: 18px; height: 18px;"> تقرير الكوادر</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-students" style="width: 18px; height: 18px;"> تحليل الأداء الطلابي العام</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-teachers" style="width: 18px; height: 18px;"> الأداء الإداري والتدريس (المدرسين)</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-programs" style="width: 18px; height: 18px;"> التقرير الفني (البرامج)</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-notes" style="width: 18px; height: 18px;"> التوصيات والملاحظات الإدارية والفنية</label>
+    </div>
+    <button class="btn btn-primary" style="margin-top: 20px;" onclick="applyReportFilters()">تطبيق التخصيص <i class="fas fa-check"></i></button>
   </div>
 </div>
 
@@ -746,14 +762,23 @@ function getImageSectionHTML(sectionId) {
   return `<div id="img-container-${sectionId}" style="display: flex; flex-wrap: wrap; gap: 15px; margin: 15px 0;"></div><button class="btn btn-outline" style="width:auto; font-size:13px; padding: 8px 16px; margin-bottom:20px;" onclick="addDynamicImageSlot('img-container-${sectionId}')"><i class="fas fa-plus"></i> إضافة صورة لهذا القسم</button>`;
 }
 
-async function generateAnalyticalReport(excludeAdmin = false) {
+function openReportFilterModal() { document.getElementById('report-filter-modal').style.display = 'flex'; }
+function applyReportFilters() { closeModal('report-filter-modal'); generateAnalyticalReport(); }
+
+async function generateAnalyticalReport() {
   if (!dashboardData || !dashboardData.data) return alert('الرجاء الانتظار حتى يتم تحميل البيانات بدقة.');
-  window.lastExcludeAdmin = excludeAdmin; // تخزين الاختيار ليدعمه زر التبديل (Toggle)
   const d = dashboardData.data;
   document.getElementById('smart-report-container').style.display = 'none';
   document.getElementById('ai-loading').style.display = 'block';
   await new Promise(resolve => setTimeout(resolve, 800));
   
+  const hideKpi = document.getElementById('hide-kpi') && document.getElementById('hide-kpi').checked;
+  const hideCadres = document.getElementById('hide-cadres') && document.getElementById('hide-cadres').checked;
+  const hideStudents = document.getElementById('hide-students') && document.getElementById('hide-students').checked;
+  const hideTeachers = document.getElementById('hide-teachers') && document.getElementById('hide-teachers').checked;
+  const hidePrograms = document.getElementById('hide-programs') && document.getElementById('hide-programs').checked;
+  const hideNotes = document.getElementById('hide-notes') && document.getElementById('hide-notes').checked;
+
   const startDate = document.getElementById('report-start-date').value || 'بداية الفترة';
   const endDate = document.getElementById('report-end-date').value || 'نهاية الفترة';
   const students = d.students || []; const teachers = d.teachersReport || []; const settings = d.settings || [];
@@ -762,39 +787,45 @@ async function generateAnalyticalReport(excludeAdmin = false) {
   reportHTML += `<h2><i class="fas fa-file-alt"></i> مقدمة عامة</h2>`;
   reportHTML += `<p>يستعرض هذا التقرير الفني والإداري الشامل الأداء العام  لـ <strong>جمعية مصر بكرة للتنمية</strong> خلال الفترة من <strong>${startDate}</strong> حتى <strong>${endDate}</strong>.</p>`;
   
-  reportHTML += `<h2><i class="fas fa-tachometer-alt"></i> لوحة مؤشرات الأداء الرئيسية</h2>`;
-  reportHTML += `<div class="report-stats-grid"><div class="report-stat-card"><span class="rp-value">${students.length}</span><span class="rp-label">إجمالي المستفيدين</span></div><div class="report-stat-card"><span class="rp-value">${students.reduce((sum, s) => sum + (s.days || 0), 0)}</span><span class="rp-label">مرات حضور الطلاب</span></div>`;
-  if(!excludeAdmin) { reportHTML += `<div class="report-stat-card"><span class="rp-value">${teachers.length}</span><span class="rp-label">عدد المدرسين</span></div>`; }
-  reportHTML += `</div>`;
-  reportHTML += getImageSectionHTML('kpi');
-
-  const cadres = students.filter(s => (s.name && s.name.includes('كادر')) || (s.shift && s.shift.includes('كادر')));
-  reportHTML += `<h2><i class="fas fa-star"></i> تقرير الكوادر (قادة المستقبل)</h2>`;
-  if (cadres.length > 0) {
-    reportHTML += `<p>إجمالي عدد الكوادر المشاركة: <strong>${cadres.length}</strong> كادر.</p>`;
-    const topCadres = [...cadres].sort((a,b) => (b.days||0) - (a.days||0));
-    reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th style="width:15%">ترتيب</th><th>اسم الكادر</th><th style="width:20%">حضور</th><th style="width:30%">البرامج</th></tr></thead><tbody>`;
-    topCadres.forEach((c, idx) => {
-      let isTop = idx < 3;
-      let rowStyle = isTop ? 'background: #fffbeb; font-weight: bold;' : '';
-      let rankIcon = isTop ? `<i class="fas fa-medal" style="color: gold;"></i>` : (idx + 1);
-      const progs = (c.programs && c.programs.length > 0) ? c.programs.join('، ') : 'غير مسجل';
-      reportHTML += `<tr style="${rowStyle}"><td>${rankIcon}</td><td style="color:var(--primary);">${c.name}</td><td>${c.days}</td><td>${progs}</td></tr>`;
-    });
-    reportHTML += `</tbody></table></div>`;
-  } else { reportHTML += `<p style="color:var(--text-muted);">لا توجد بيانات كوادر مسجلة في هذه الفترة.</p>`; }
-  reportHTML += getImageSectionHTML('cadres');
-
-  const topStudents = [...students].sort((a, b) => (b.days || 0) - (a.days || 0)).slice(0, 3);
-  reportHTML += `<h2><i class="fas fa-user-graduate"></i> تحليل الأداء الطلابي العام</h2>`;
-  if (topStudents.length > 0) {
-    reportHTML += `<h3>قائمة الشرف للأكثر التزاماً</h3><ul>`;
-    topStudents.forEach(s => { reportHTML += `<li><strong>${s.name}</strong> (${s.days} يوم حضور).</li>`; });
-    reportHTML += `</ul>`;
+  if (!hideKpi) {
+    reportHTML += `<h2><i class="fas fa-tachometer-alt"></i> لوحة مؤشرات الأداء الرئيسية</h2>`;
+    reportHTML += `<div class="report-stats-grid"><div class="report-stat-card"><span class="rp-value">${students.length}</span><span class="rp-label">إجمالي المستفيدين</span></div><div class="report-stat-card"><span class="rp-value">${students.reduce((sum, s) => sum + (s.days || 0), 0)}</span><span class="rp-label">مرات حضور الطلاب</span></div>`;
+    if(!hideTeachers) { reportHTML += `<div class="report-stat-card"><span class="rp-value">${teachers.length}</span><span class="rp-label">عدد المدرسين</span></div>`; }
+    reportHTML += `</div>`;
+    reportHTML += getImageSectionHTML('kpi');
   }
-  reportHTML += getImageSectionHTML('students');
 
-  if (!excludeAdmin) {
+  if (!hideCadres) {
+    const cadres = students.filter(s => (s.name && s.name.includes('كادر')) || (s.shift && s.shift.includes('كادر')));
+    reportHTML += `<h2><i class="fas fa-star"></i> تقرير الكوادر (قادة المستقبل)</h2>`;
+    if (cadres.length > 0) {
+      reportHTML += `<p>إجمالي عدد الكوادر المشاركة: <strong>${cadres.length}</strong> كادر.</p>`;
+      const topCadres = [...cadres].sort((a,b) => (b.days||0) - (a.days||0));
+      reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th style="width:15%">ترتيب</th><th>اسم الكادر</th><th style="width:20%">حضور</th><th style="width:30%">البرامج</th></tr></thead><tbody>`;
+      topCadres.forEach((c, idx) => {
+        let isTop = idx < 3;
+        let rowStyle = isTop ? 'background: #fffbeb; font-weight: bold;' : '';
+        let rankIcon = isTop ? `<i class="fas fa-medal" style="color: gold;"></i>` : (idx + 1);
+        const progs = (c.programs && c.programs.length > 0) ? c.programs.join('، ') : 'غير مسجل';
+        reportHTML += `<tr style="${rowStyle}"><td>${rankIcon}</td><td style="color:var(--primary);">${c.name}</td><td>${c.days}</td><td>${progs}</td></tr>`;
+      });
+      reportHTML += `</tbody></table></div>`;
+    } else { reportHTML += `<p style="color:var(--text-muted);">لا توجد بيانات كوادر مسجلة في هذه الفترة.</p>`; }
+    reportHTML += getImageSectionHTML('cadres');
+  }
+
+  if (!hideStudents) {
+    const topStudents = [...students].sort((a, b) => (b.days || 0) - (a.days || 0)).slice(0, 3);
+    reportHTML += `<h2><i class="fas fa-user-graduate"></i> تحليل الأداء الطلابي العام</h2>`;
+    if (topStudents.length > 0) {
+      reportHTML += `<h3>قائمة الشرف للأكثر التزاماً</h3><ul>`;
+      topStudents.forEach(s => { reportHTML += `<li><strong>${s.name}</strong> (${s.days} يوم حضور).</li>`; });
+      reportHTML += `</ul>`;
+    }
+    reportHTML += getImageSectionHTML('students');
+  }
+
+  if (!hideTeachers) {
     reportHTML += `<h2><i class="fas fa-chalkboard-teacher"></i> الأداء الإداري والتدريس</h2>`;
     if (teachers.length > 0) {
       reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th>المدرس</th><th>حضور فعلي</th><th>غياب</th><th>إجازات</th></tr></thead><tbody>`;
@@ -804,126 +835,127 @@ async function generateAnalyticalReport(excludeAdmin = false) {
     reportHTML += getImageSectionHTML('teachers');
   }
 
-  // التقرير الفني المحدث والمدعوم بزر التبديل والعرض السردي 
-  reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
-  let activeSettings = settings.filter(s => s.count > 0);
-  let isNarrative = document.getElementById('narrative-toggle') ? document.getElementById('narrative-toggle').checked : false;
+  if (!hidePrograms) {
+    reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
+    let activeSettings = settings.filter(s => s.count > 0);
+    let isNarrative = document.getElementById('narrative-toggle') ? document.getElementById('narrative-toggle').checked : false;
 
-  if (activeSettings.length > 0) {
-      let progTeachers = {}; let progStudentsUnique = {}; 
-      
-      teachers.forEach(t => { Object.keys(t.programs || {}).forEach(p => { if(!progTeachers[p]) progTeachers[p] = new Set(); progTeachers[p].add(t.name); }); });
-      students.forEach(s => { (s.programs || []).forEach(p => { if(!progStudentsUnique[p]) progStudentsUnique[p] = new Set(); progStudentsUnique[p].add(s.id); }); });
+    if (activeSettings.length > 0) {
+        let progTeachers = {}; let progStudentsUnique = {}; 
+        
+        teachers.forEach(t => { Object.keys(t.programs || {}).forEach(p => { if(!progTeachers[p]) progTeachers[p] = new Set(); progTeachers[p].add(t.name); }); });
+        students.forEach(s => { (s.programs || []).forEach(p => { if(!progStudentsUnique[p]) progStudentsUnique[p] = new Set(); progStudentsUnique[p].add(s.id); }); });
 
-      let structuredMap = {};
-      activeSettings.forEach(s => {
-          if (!structuredMap[s.program]) structuredMap[s.program] = {};
-          let lvlName = s.level || 'عام';
-          if (!structuredMap[s.program][lvlName]) structuredMap[s.program][lvlName] = [];
-          structuredMap[s.program][lvlName].push(s);
-      });
+        let structuredMap = {};
+        activeSettings.forEach(s => {
+            if (!structuredMap[s.program]) structuredMap[s.program] = {};
+            let lvlName = s.level || 'عام';
+            if (!structuredMap[s.program][lvlName]) structuredMap[s.program][lvlName] = [];
+            structuredMap[s.program][lvlName].push(s);
+        });
 
-      if (!isNarrative) {
-          // ================= الجدول المعتاد =================
-          reportHTML += `
-          <div class="table-container">
-              <table class="report-table" style="table-layout: fixed; width: 100%;">
-                  <thead>
-                      <tr>
-                          <th style="width:12%">البرنامج</th>
-                          <th style="width:10%">المستوى</th>
-                          <th style="width:50%">النشاط المنفذ</th>
-                          ${!excludeAdmin ? '<th style="width:15%">المدرسين</th>' : ''}
-                          <th style="width:13%">المستفيدين</th>
-                      </tr>
-                  </thead>
-                  <tbody>`;
+        if (!isNarrative) {
+            reportHTML += `
+            <div class="table-container">
+                <table class="report-table" style="table-layout: fixed; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width:12%">البرنامج</th>
+                            <th style="width:10%">المستوى</th>
+                            <th style="width:50%">النشاط المنفذ</th>
+                            ${!hideTeachers ? '<th style="width:15%">المدرسين</th>' : ''}
+                            <th style="width:13%">المستفيدين</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
-          Object.keys(structuredMap).forEach(progName => {
-              let levelsGroup = structuredMap[progName];
-              let levelNames = Object.keys(levelsGroup);
-              
-              let totalProgRows = 0;
-              levelNames.forEach(l => totalProgRows += levelsGroup[l].length);
+            Object.keys(structuredMap).forEach(progName => {
+                let levelsGroup = structuredMap[progName];
+                let levelNames = Object.keys(levelsGroup);
+                
+                let totalProgRows = 0;
+                levelNames.forEach(l => totalProgRows += levelsGroup[l].length);
 
-              let isFirstRowOfProg = true;
+                let isFirstRowOfProg = true;
 
-              levelNames.forEach(lvlName => {
-                  let activities = levelsGroup[lvlName];
-                  let levelRowSpan = activities.length;
-                  
-                  activities.forEach((activity, actIdx) => {
-                      reportHTML += `<tr>`;
+                levelNames.forEach(lvlName => {
+                    let activities = levelsGroup[lvlName];
+                    let levelRowSpan = activities.length;
+                    
+                    activities.forEach((activity, actIdx) => {
+                        reportHTML += `<tr>`;
 
-                      if (isFirstRowOfProg) {
-                          reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:900; background:#f8fafc; text-align:center; vertical-align:middle;">${progName}</td>`;
-                      }
+                        if (isFirstRowOfProg) {
+                            reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:900; background:#f8fafc; text-align:center; vertical-align:middle;">${progName}</td>`;
+                        }
 
-                      if (actIdx === 0) {
-                          reportHTML += `<td rowspan="${levelRowSpan}" style="font-weight:bold; color:var(--info); text-align:center; vertical-align:middle; background:#fff;">${lvlName}</td>`;
-                      }
+                        if (actIdx === 0) {
+                            reportHTML += `<td rowspan="${levelRowSpan}" style="font-weight:bold; color:var(--info); text-align:center; vertical-align:middle; background:#fff;">${lvlName}</td>`;
+                        }
 
-                      reportHTML += `<td style="text-align:right; padding:8px; line-height:1.4;">
-                          <span class="editable-text">${activity.keyword}</span> <span style="color:var(--text-muted); font-size:11px;">(${activity.count})</span>
-                      </td>`;
+                        reportHTML += `<td style="text-align:right; padding:8px; line-height:1.4;">
+                            <span class="editable-text">${activity.keyword}</span> <span style="color:var(--text-muted); font-size:11px;">(${activity.count})</span>
+                        </td>`;
 
-                      if (isFirstRowOfProg) {
-                          let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join("، ") : "غير محدد";
-                          let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
+                        if (isFirstRowOfProg) {
+                            let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join("، ") : "غير محدد";
+                            let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
 
-                          if (!excludeAdmin) {
-                              reportHTML += `<td rowspan="${totalProgRows}" style="font-size:12px; vertical-align:middle;"><span class="editable-text">${teachersList}</span></td>`;
-                          }
-                          reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:bold; color:var(--primary); text-align:center; vertical-align:middle;">${uniqueBenCount}</td>`;
-                      }
+                            if (!hideTeachers) {
+                                reportHTML += `<td rowspan="${totalProgRows}" style="font-size:12px; vertical-align:middle;"><span class="editable-text">${teachersList}</span></td>`;
+                            }
+                            reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:bold; color:var(--primary); text-align:center; vertical-align:middle;">${uniqueBenCount}</td>`;
+                        }
 
-                      reportHTML += `</tr>`;
-                      isFirstRowOfProg = false; 
-                  });
-              });
-          });
+                        reportHTML += `</tr>`;
+                        isFirstRowOfProg = false; 
+                    });
+                });
+            });
 
-          reportHTML += `</tbody></table></div>`;
-      } else {
-          // ================= العرض السردي (Narrative View) =================
-          Object.keys(structuredMap).forEach((progName, progIdx) => {
-              let levelsGroup = structuredMap[progName];
-              let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join(" و ") : "نخبة من المدربين";
-              let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
-              let paraId = `prog-para-${progIdx}`;
+            reportHTML += `</tbody></table></div>`;
+        } else {
+            Object.keys(structuredMap).forEach((progName, progIdx) => {
+                let levelsGroup = structuredMap[progName];
+                let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join(" و ") : "نخبة من المدربين";
+                let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
+                let paraId = `prog-para-${progIdx}`;
 
-              reportHTML += `<h3 style="color: var(--secondary); margin-top: 20px;"><i class="fas fa-caret-left"></i> برنامج ${progName}</h3>`;
-              reportHTML += `<p id="${paraId}" class="editable-text" style="line-height: 1.8; font-size: 15px; text-align: justify; background: #f8fafc; padding: 15px; border-radius: 12px; border-right: 4px solid var(--secondary);">`;
+                reportHTML += `<h3 style="color: var(--secondary); margin-top: 20px;"><i class="fas fa-caret-left"></i> برنامج ${progName}</h3>`;
+                reportHTML += `<p id="${paraId}" class="editable-text" style="line-height: 1.8; font-size: 15px; text-align: justify; background: #f8fafc; padding: 15px; border-radius: 12px; border-right: 4px solid var(--secondary);">`;
 
-              reportHTML += `تم تنفيذ أنشطة <strong>برنامج ${progName}</strong> بنجاح `;
-              if (!excludeAdmin) {
-                  reportHTML += `تحت إشراف المدربين: (<span style="color:var(--primary); font-weight:bold;">${teachersList}</span>)، `;
-              }
-              reportHTML += `وقد استفاد من البرنامج <strong>${uniqueBenCount}</strong> مستفيداً. وتضمنت الفعاليات المستويات والأنشطة التالية: `;
+                reportHTML += `تم تنفيذ أنشطة <strong>برنامج ${progName}</strong> بنجاح `;
+                if (!hideTeachers) {
+                    reportHTML += `تحت إشراف المدربين: (<span style="color:var(--primary); font-weight:bold;">${teachersList}</span>)، `;
+                }
+                reportHTML += `وقد استفاد من البرنامج <strong>${uniqueBenCount}</strong> مستفيداً. وتضمنت الفعاليات المستويات والأنشطة التالية: `;
 
-              let levelTexts = [];
-              Object.keys(levelsGroup).forEach(lvlName => {
-                  let activities = levelsGroup[lvlName].map(a => a.keyword).join("، و");
-                  levelTexts.push(`في <strong>${lvlName}</strong> تم تقديم (${activities})`);
-              });
+                let levelTexts = [];
+                Object.keys(levelsGroup).forEach(lvlName => {
+                    let activities = levelsGroup[lvlName].map(a => a.keyword).join("، و");
+                    levelTexts.push(`في <strong>${lvlName}</strong> تم تقديم (${activities})`);
+                });
 
-              reportHTML += levelTexts.join("؛ بالإضافة إلى أنه ") + `.`;
-              reportHTML += `</p>`;
-          });
-      }
+                reportHTML += levelTexts.join("؛ بالإضافة إلى أنه ") + `.`;
+                reportHTML += `</p>`;
+            });
+        }
 
-  } else {
-      reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`;
+    } else {
+        reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`;
+    }
+    
+    reportHTML += getImageSectionHTML('programs');
   }
-  
-  reportHTML += getImageSectionHTML('programs');
 
-  reportHTML += `<h2><i class="fas fa-lightbulb"></i> التوصيات والملاحظات الإدارية والفنية</h2>`;
-  const notesData = d.notes || []; 
-  let validNotes = notesData.filter(n => n && n.trim() !== "");
-  if(validNotes.length > 0) {
-    reportHTML += `<ul>`; validNotes.forEach(note => { reportHTML += `<li>${note}</li>`; }); reportHTML += `</ul>`;
-  } else { reportHTML += `<p style="color:var(--text-muted);">لم يتم تدوين أي توصيات في سجلات الحضور لهذه الفترة.</p>`; }
+  if (!hideNotes) {
+    reportHTML += `<h2><i class="fas fa-lightbulb"></i> التوصيات والملاحظات الإدارية والفنية</h2>`;
+    const notesData = d.notes || []; 
+    let validNotes = notesData.filter(n => n && n.trim() !== "");
+    if(validNotes.length > 0) {
+      reportHTML += `<ul>`; validNotes.forEach(note => { reportHTML += `<li>${note}</li>`; }); reportHTML += `</ul>`;
+    } else { reportHTML += `<p style="color:var(--text-muted);">لم يتم تدوين أي توصيات في سجلات الحضور لهذه الفترة.</p>`; }
+  }
 
   document.getElementById('ai-loading').style.display = 'none';
   document.getElementById('smart-report-content').innerHTML = reportHTML;
@@ -1134,19 +1166,21 @@ if ('serviceWorker' in navigator) {
 
 // === الدالة الجديدة الخاصة بوضع التعديل اليدوي ===
 function toggleEditMode() {
-    const editableElements = document.querySelectorAll('.editable-text');
+    const reportContainer = document.getElementById('smart-report-container');
     const isEditing = document.body.getAttribute('data-editing') === 'true';
 
     if (isEditing) {
         // إيقاف التعديل
-        editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+        reportContainer.setAttribute('contenteditable', 'false');
+        reportContainer.style.border = '';
         document.body.setAttribute('data-editing', 'false');
         alert('تم إغلاق وضع التعديل اليدوي.');
     } else {
         // تفعيل التعديل
-        editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+        reportContainer.setAttribute('contenteditable', 'true');
+        reportContainer.style.border = '2px dashed var(--warning)';
         document.body.setAttribute('data-editing', 'true');
-        alert('وضع التعديل مفعل. يمكنك الآن النقر على النصوص المظللة باللون الأصفر وتعديلها يدوياً.');
+        alert('وضع التعديل مفعل. التقرير بالكامل قابل للتعديل الآن.');
     }
 }
 </script>
