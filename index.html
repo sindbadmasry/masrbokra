@@ -197,21 +197,7 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .uploaded-report-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 10;}
 .ai-loader { display: none; text-align: center; padding: 40px 20px; }
 .ai-loader i { color: var(--primary); font-size: 40px; animation: spin 2s linear infinite; margin-bottom: 15px; }
-<div class="no-print" style="margin-bottom: 20px; padding: 15px; background: #f0f7ff; border-radius: 12px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-        <label style="display: flex; align-items: center; gap: 12px; font-weight: 800; cursor: pointer; color: var(--primary); font-size: 15px;">
-            <div class="toggle-switch">
-                <input type="checkbox" id="narrative-mode-toggle" style="opacity: 0; position: absolute; width: 0; height: 0;">
-                <span class="switch-slider"></span>
-            </div>
-            <i class="fas fa-magic" style="color: #8b5cf6;"></i> 
-            تفعيل العرض السردي المطور (Modern Narrative Report)
-        </label>
-        <span style="font-size: 12px; color: #64748b; background: #ffffff; padding: 4px 10px; border-radius: 20px; border: 1px solid #e2e8f0;">
-            يتيح إضافة صور وتعديل النصوص يدوياً لكل برنامج
-        </span>
-    </div>
-</div>
+
 
 /* إعدادات الطباعة و PDF */
 .pdf-mode { padding: 15px !important; box-shadow: none !important; border: none !important; max-width: 100% !important; }
@@ -432,11 +418,11 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
     <div id="view-general" class="view" style="display:none;">
       <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
       
-<div style="margin-bottom: 20px; padding: 15px; background: #f0f7ff; border-radius: 12px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+<div class="no-print" style="margin-bottom: 20px; padding: 15px; background: #f0f7ff; border-radius: 12px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
         <label style="display: flex; align-items: center; gap: 12px; font-weight: 800; cursor: pointer; color: var(--primary); font-size: 15px;">
             <div class="toggle-switch">
-                <input type="checkbox" id="narrative-mode-toggle" style="display: none;">
+                <input type="checkbox" id="narrative-mode-toggle" style="opacity: 0; position: absolute; width: 0; height: 0;">
                 <span class="switch-slider"></span>
             </div>
             <i class="fas fa-magic" style="color: #8b5cf6;"></i> 
