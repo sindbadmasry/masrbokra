@@ -1,4 +1,4 @@
-const CACHE_NAME = 'masrbokra-cache-v3'; // قمت بزيادة الإصدار للتحديث
+const CACHE_NAME = 'masrbokra-cache-v3.1'; // قمت بزيادة الإصدار للتحديث
 
 const ASSETS_TO_CACHE = [
   './',
