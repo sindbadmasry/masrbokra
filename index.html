@@ -852,9 +852,9 @@ async function generateAnalyticalReport(excludeAdmin = false) {
                   </h3>
                   
                   <p style="font-size: 15.5px; line-height: 1.8; color: #334155; text-align: justify; margin-bottom: 15px; font-weight: 600;">
-                      في إطار خطة التنمية وبناء القدرات، تم تنفيذ حزمة من الأنشطة التفاعلية الفعالة ضمن <strong>${progName}</strong>. 
-                      وقد أسفرت هذه الجهود عن إفادة <strong>${uniqueBenCount}</strong> مستفيداً. 
-                      ${!excludeAdmin ? `وتولى الإشراف على تنفيذ هذه الفعاليات وإدارتها بكفاءة نخبة من المدربين وهم: (<strong>${teachersList}</strong>).` : ''}
+                       <strong>${progName}</strong>. 
+                      استفاد من هذا البرنامج <strong>${uniqueBenCount}</strong> طالبا من ابنائنا. 
+                      ${!excludeAdmin ? `واشرف على التنفيذ الاساتذة: (<strong>${teachersList}</strong>).` : ''}
                   </p>
                   
                   <div style="background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
@@ -873,7 +873,7 @@ async function generateAnalyticalReport(excludeAdmin = false) {
                   
                   <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
                       <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block; margin-bottom: 10px;">
-                          <i class="fas fa-camera-retro" style="color: var(--secondary);"></i> التوثيق البصري للبرنامج (اختياري)
+                          <i class="fas fa-camera-retro" style="color: var(--secondary);"></i> الصور
                       </span>
                       ${getImageSectionHTML('prog-dynamic-' + idx)}
                   </div>
