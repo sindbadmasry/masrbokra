@@ -197,54 +197,21 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .uploaded-report-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 10;}
 .ai-loader { display: none; text-align: center; padding: 40px 20px; }
 .ai-loader i { color: var(--primary); font-size: 40px; animation: spin 2s linear infinite; margin-bottom: 15px; }
-/* تنسيق زر التبديل المطور */
-.toggle-switch {
-  position: relative;
-  width: 45px;
-  height: 24px;
-}
-.switch-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #cbd5e1;
-  transition: .4s;
-  border-radius: 24px;
-}
-.switch-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px; width: 18px;
-  left: 3px; bottom: 3px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-input:checked + .switch-slider { background-color: var(--primary); }
-input:checked + .switch-slider:before { transform: translateX(21px); }
-
-/* إخفاء أزرار التعديل وأدوات التحكم عند الطباعة */
-@media print {
-  .no-print, .btn-outline, .btn-success, .image-upload-section {
-    display: none !important;
-  }
-  [contenteditable="true"] {
-    border: none !important;
-    background: transparent !important;
-  }
-}
-
-/* تحسين شكل الزر داخل التقرير */
-.btn-outline {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    transition: 0.2s;
-}
-.btn-outline:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-}
+<div class="no-print" style="margin-bottom: 20px; padding: 15px; background: #f0f7ff; border-radius: 12px; border: 1px solid #dbeafe; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <label style="display: flex; align-items: center; gap: 12px; font-weight: 800; cursor: pointer; color: var(--primary); font-size: 15px;">
+            <div class="toggle-switch">
+                <input type="checkbox" id="narrative-mode-toggle" style="opacity: 0; position: absolute; width: 0; height: 0;">
+                <span class="switch-slider"></span>
+            </div>
+            <i class="fas fa-magic" style="color: #8b5cf6;"></i> 
+            تفعيل العرض السردي المطور (Modern Narrative Report)
+        </label>
+        <span style="font-size: 12px; color: #64748b; background: #ffffff; padding: 4px 10px; border-radius: 20px; border: 1px solid #e2e8f0;">
+            يتيح إضافة صور وتعديل النصوص يدوياً لكل برنامج
+        </span>
+    </div>
+</div>
 
 /* إعدادات الطباعة و PDF */
 .pdf-mode { padding: 15px !important; box-shadow: none !important; border: none !important; max-width: 100% !important; }
@@ -1179,6 +1146,33 @@ async function submitAttendance() {
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'submitAttendance', ids: ids, customDate: date, programs: selectedProgsBase.join(" - "), teachers: selectedTeachers.join(" - "), notes: extraInfo }) });
     alert("تم إرسال كشف الحضور بنجاح"); document.getElementById('att-student-ids').value = ""; document.getElementById('prog-notes').value = ""; document.getElementById('teacher-list-upward').classList.remove('show'); fetchDashboard();
   } catch (e) { alert("حدث خطأ أثناء إرسال البيانات."); } showLoader(false);
+}
+// دالة تفعيل/إلغاء وضع التعديل اليدوي للنصوص السردية
+function toggleEditMode(elementId, btnElement) {
+    const textElement = document.getElementById(elementId);
+    
+    if (textElement.isContentEditable) {
+        // حفظ التعديل
+        textElement.contentEditable = "false";
+        textElement.style.background = "transparent";
+        textElement.style.border = "none";
+        textElement.style.boxShadow = "none";
+        
+        btnElement.innerHTML = '<i class="fas fa-edit"></i> تعديل النص';
+        btnElement.classList.remove('btn-success');
+        btnElement.classList.add('btn-outline');
+    } else {
+        // تفعيل التعديل
+        textElement.contentEditable = "true";
+        textElement.style.background = "#ffffff";
+        textElement.style.border = "1px dashed var(--primary)";
+        textElement.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.1)";
+        textElement.focus();
+        
+        btnElement.innerHTML = '<i class="fas fa-save"></i> حفظ التعديل';
+        btnElement.classList.remove('btn-outline');
+        btnElement.classList.add('btn-success');
+    }
 }
 
 async function submitManualLeave() {
