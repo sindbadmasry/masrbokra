@@ -918,6 +918,118 @@ async function generateAnalyticalReport(excludeAdmin = false) {
                       }
 
                       if (actIdx === 0) {
+  // ================= بداية التقرير الفني للبرامج =================
+  reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
+  let activeSettings = settings.filter(s => s.count > 0);
+
+  if (activeSettings.length > 0) {
+      let progTeachers = {}; let progStudentsUnique = {}; 
+      
+      // تجميع البيانات الأساسية
+      teachers.forEach(t => { Object.keys(t.programs || {}).forEach(p => { if(!progTeachers[p]) progTeachers[p] = new Set(); progTeachers[p].add(t.name); }); });
+      students.forEach(s => { (s.programs || []).forEach(p => { if(!progStudentsUnique[p]) progStudentsUnique[p] = new Set(); progStudentsUnique[p].add(s.id); }); });
+
+      // هيكلة البيانات
+      let structuredMap = {};
+      activeSettings.forEach(s => {
+          if (!structuredMap[s.program]) structuredMap[s.program] = {};
+          let lvlName = s.level || 'عام';
+          if (!structuredMap[s.program][lvlName]) structuredMap[s.program][lvlName] = [];
+          structuredMap[s.program][lvlName].push(s);
+      });
+
+      // التحقق من تفعيل خيار "التقرير السردي"
+      const isNarrative = document.getElementById('narrative-mode-toggle')?.checked;
+
+      if (isNarrative) {
+          // --- 1. العرض السردي الحديث ---
+          reportHTML += `<div class="narrative-programs-container" style="margin-top: 20px; display: flex; flex-direction: column; gap: 20px;">`;
+          
+          Object.keys(structuredMap).forEach((progName, idx) => {
+              let levelsGroup = structuredMap[progName];
+              let levelNames = Object.keys(levelsGroup);
+              let uniqueBenCount = progStudentsUnique[progName] ? progStudentsUnique[progName].size : 0;
+              let teachersList = progTeachers[progName] ? Array.from(progTeachers[progName]).join("، ") : "غير محدد";
+              let paraId = `narrative-text-${idx}`; // معرّف فريد لكل فقرة
+
+              reportHTML += `
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-right: 5px solid var(--primary); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); page-break-inside: avoid; break-inside: avoid;">
+                  
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 10px; margin-bottom: 15px;">
+                      <h3 style="color: var(--primary); margin: 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                          <i class="fas fa-star" style="color: #f59e0b; font-size: 16px;"></i> برنامج: ${progName}
+                      </h3>
+                      <button type="button" onclick="toggleEditMode('${paraId}', this)" class="btn btn-outline no-print" style="width: auto; padding: 6px 12px; font-size: 12px; border-radius: 8px;">
+                          <i class="fas fa-edit"></i> تعديل النص
+                      </button>
+                  </div>
+                  
+                  <p id="${paraId}" style="font-size: 15.5px; line-height: 1.8; color: #334155; text-align: justify; margin-bottom: 15px; font-weight: 600; padding: 10px; border-radius: 8px; transition: all 0.3s ease; outline: none;">
+                      في إطار خطة التنمية وبناء القدرات، تم تنفيذ حزمة من الأنشطة التفاعلية الفعالة ضمن <strong>${progName}</strong>. 
+                      وقد أسفرت هذه الجهود عن إفادة <strong>${uniqueBenCount}</strong> مستفيداً. 
+                      ${!excludeAdmin ? `وتولى الإشراف على تنفيذ هذه الفعاليات وإدارتها بكفاءة نخبة من المدربين وهم: (<strong>${teachersList}</strong>).` : ''}
+                  </p>
+                  
+                  <div style="background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                      <h4 style="margin-top: 0; color: var(--text-dark); font-size: 14px; margin-bottom: 10px;"><i class="fas fa-tasks text-success"></i> تفصيل الأنشطة المنفذة حسب المستويات:</h4>
+                      <ul style="margin: 0; padding-right: 20px;">`;
+                      
+              levelNames.forEach(lvlName => {
+                  let activities = levelsGroup[lvlName];
+                  let actsText = activities.map(a => `<span style="color:var(--info); font-weight:bold;">${a.keyword}</span> <span style="font-size:12px; color:var(--text-muted);">(${a.count})</span>`).join('، ');
+                  reportHTML += `<li style="margin-bottom: 10px; font-size: 14px; color: #475569;">مستوى <strong>${lvlName}</strong>: تضمن تنفيذ أنشطة متنوعة أبرزها [ ${actsText} ].</li>`;
+              });
+
+              reportHTML += `
+                      </ul>
+                  </div>
+                  
+                  <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                      <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block; margin-bottom: 10px;">
+                          <i class="fas fa-camera-retro" style="color: var(--secondary);"></i> التوثيق البصري للبرنامج (اختياري)
+                      </span>
+                      ${getImageSectionHTML('prog-dynamic-' + idx)}
+                  </div>
+              </div>`;
+          });
+          reportHTML += `</div>`;
+      } else {
+          // --- 2. العرض الجدولي (الأسلوب الكلاسيكي) ---
+          reportHTML += `
+          <div class="table-container">
+              <table class="report-table" style="table-layout: fixed; width: 100%;">
+                  <thead>
+                      <tr>
+                          <th style="width:12%">البرنامج</th>
+                          <th style="width:10%">المستوى</th>
+                          <th style="width:50%">النشاط المنفذ</th>
+                          ${!excludeAdmin ? '<th style="width:15%">المدرسين</th>' : ''}
+                          <th style="width:13%">المستفيدين</th>
+                      </tr>
+                  </thead>
+                  <tbody>`;
+
+          Object.keys(structuredMap).forEach(progName => {
+              let levelsGroup = structuredMap[progName];
+              let levelNames = Object.keys(levelsGroup);
+              
+              let totalProgRows = 0;
+              levelNames.forEach(l => totalProgRows += levelsGroup[l].length);
+
+              let isFirstRowOfProg = true;
+
+              levelNames.forEach(lvlName => {
+                  let activities = levelsGroup[lvlName];
+                  let levelRowSpan = activities.length; 
+                  
+                  activities.forEach((activity, actIdx) => {
+                      reportHTML += `<tr>`;
+
+                      if (isFirstRowOfProg) {
+                          reportHTML += `<td rowspan="${totalProgRows}" style="font-weight:900; background:#f8fafc; text-align:center; vertical-align:middle;">${progName}</td>`;
+                      }
+
+                      if (actIdx === 0) {
                           reportHTML += `<td rowspan="${levelRowSpan}" style="font-weight:bold; color:var(--info); text-align:center; vertical-align:middle; background:#fff;">${lvlName}</td>`;
                       }
 
@@ -949,7 +1061,8 @@ async function generateAnalyticalReport(excludeAdmin = false) {
       reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`;
       reportHTML += getImageSectionHTML('programs');
   }
-  // نهاية الكود المعدل للتقرير 
+  // ================= نهاية التقرير الفني للبرامج =================
+
 
   reportHTML += `<h2><i class="fas fa-lightbulb"></i> التوصيات والملاحظات الإدارية والفنية</h2>`;
   const notesData = d.notes || []; 
@@ -1147,6 +1260,7 @@ async function submitAttendance() {
     alert("تم إرسال كشف الحضور بنجاح"); document.getElementById('att-student-ids').value = ""; document.getElementById('prog-notes').value = ""; document.getElementById('teacher-list-upward').classList.remove('show'); fetchDashboard();
   } catch (e) { alert("حدث خطأ أثناء إرسال البيانات."); } showLoader(false);
 }
+
 // دالة تفعيل/إلغاء وضع التعديل اليدوي للنصوص السردية
 function toggleEditMode(elementId, btnElement) {
     const textElement = document.getElementById(elementId);
