@@ -1143,8 +1143,6 @@ function renderStudentsTable() {
     <tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
         <td style="font-weight:900; color:var(--primary)">${s.id}</td>
         <td style="font-weight:700;">${s.name} <br><span style="font-size:11px; color:var(--text-muted);">${s.shift}</span></td>
-        <td style="font-weight:600;">${s.currentLevel || '-'}</td>
-        <td style="font-weight:700; color:var(--info);">${s.newLevel || '-'}</td>
         <td><span class="badge bg-approved" style="font-size:13px;">${s.days} يوم</span></td>
     </tr>
   `).join('');
