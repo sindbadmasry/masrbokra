@@ -494,6 +494,19 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
     </div>
     <div style="margin-top: 20px;">
       <label style="font-weight: 800; font-size: 14px; margin-bottom: 10px; display: block;">البرامج المشارك فيها:</label>
+      <div style="margin-top: 20px;">
+  <label style="font-weight: 800; font-size: 14px; margin-bottom: 10px; display: block;">البرامج المشارك فيها:</label>
+  <div class="multi-select" id="modal-programs-list" style="pointer-events: none;"></div>
+</div>
+
+<div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+    <label style="font-weight: 800; font-size: 14px; margin-bottom: 8px; display: block;">تعديل مستوى الطالب:</label>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="modal-student-level" class="input-field" placeholder="أدخل المستوى هنا..." style="flex: 1;">
+        <button class="btn btn-primary" onclick="updateStudentLevel()" style="width: auto; padding: 10px 15px; font-size: 14px;">حفظ</button>
+    </div>
+</div>
+
       <div class="multi-select" id="modal-programs-list" style="pointer-events: none;"></div>
     </div>
   </div>
