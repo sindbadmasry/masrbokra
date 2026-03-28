@@ -33,7 +33,6 @@ body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
 
-/* شاشة الدخول والحقول */
 #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), #1e3a8a); display: flex; align-items: center; justify-content: center; z-index: 5000; }
 .login-box { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .login-box h2 { margin: 15px 0 5px; color: var(--text-dark); font-weight: 900; }
@@ -54,58 +53,14 @@ body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1
     .table-container, main, body { overflow: visible !important; position: static !important; background: white !important; margin: 0 !important; padding: 0 !important; }
     .editable-text[contenteditable="true"] { background-color: transparent !important; border: none !important; }
 }
-/* حاوية تضمن عدم خروج الفلتر عن إطار الصفحة */
-.quick-filters-wrapper {
-  width: 100%;
-  padding: 10px 0;
-  box-sizing: border-box;
-}
 
-/* الجسم الرئيسي للفلتر - توزيع مرن */
-.segmented-control {
-  display: flex;
-  background: #f1f5f9; /* رمادي فاتح للخلفية */
-  padding: 4px;
-  border-radius: 14px;
-  gap: 2px;
-  width: 100%;
-}
+.quick-filters-wrapper { width: 100%; padding: 10px 0; box-sizing: border-box; }
+.segmented-control { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; gap: 2px; width: 100%; }
+.control-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0; border: none; background: transparent; color: #64748b; cursor: pointer; border-radius: 11px; transition: all 0.3s ease; }
+.control-item i { font-size: 1.1rem; margin-bottom: 4px; }
+.control-item span { font-size: 0.7rem; font-weight: 700; font-family: 'Tajawal', sans-serif; white-space: nowrap; }
+.control-item.active { background: #ffffff; color: var(--primary); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); }
 
-/* العنصر الفردي (الزر) */
-.control-item {
-  flex: 1; /* يضمن توزيع الـ 5 أزرار بالتساوي تماماً */
-  display: flex;
-  flex-direction: column; /* الأيقونة فوق النص لتوفير العرض */
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  cursor: pointer;
-  border-radius: 11px;
-  transition: all 0.3s ease;
-}
-
-.control-item i {
-  font-size: 1.1rem;
-  margin-bottom: 4px;
-}
-
-.control-item span {
-  font-size: 0.7rem;
-  font-weight: 700;
-  font-family: 'Tajawal', sans-serif;
-  white-space: nowrap;
-}
-
-/* حالة الزر النشط (بديل btn-primary) */
-.control-item.active {
-  background: #ffffff; /* خلفية بيضاء للزر المختار */
-  color: var(--primary); /* اللون الأزرق الأساسي للمؤسسة */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-/* الأزرار */
 .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
 .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
 .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
@@ -116,7 +71,6 @@ body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1
 .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-dark); }
 .btn-ai { background: linear-gradient(135deg, #0d9488, #0f172a); color: white; box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3); animation: pulseGlow 2s infinite; }
 
-/* التصميم الأساسي والبطاقات */
 #app-content { display: none; animation: fadeIn 0.5s ease; }
 header { background: var(--card-bg); color: var(--text-dark); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
 .user-info { display: flex; align-items: center; gap: 12px; }
@@ -129,31 +83,28 @@ header { background: var(--card-bg); color: var(--text-dark); padding: 15px 20px
 .card-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text-dark); display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
 .card-title i { color: var(--primary); background: #eff6ff; padding: 8px; border-radius: 10px; }
 
-/* الإحصائيات والجداول */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
 .stat-item { background: linear-gradient(145deg, #ffffff, #f8fafc); padding: 12px; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); position: relative; overflow: hidden; }
 .stat-item::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: inherit; border-top: 4px solid var(--primary); }
 .stat-item .value { font-size: 24px; font-weight: 900; display: block; color: var(--text-dark); margin-bottom: 2px; }
 .stat-item .label { font-size: 12px; font-weight: 800; color: var(--text-muted); }
 
-/* القوائم المنسدلة والخيارات */
 .custom-dropdown { position: relative; width: 100%; }
 .dropdown-header { padding: 14px 16px; border: 2px solid var(--border); border-radius: 14px; background: #f1f5f9; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; color: var(--text-muted); transition: 0.3s; }
 .dropdown-list { display: none; position: absolute; bottom: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15); max-height: 220px; overflow-y: auto; z-index: 100; margin-bottom: 8px; padding: 10px; flex-direction: column; gap: 5px; }
 .dropdown-list.show { display: flex; animation: fadeIn 0.2s ease; }
 .teacher-option { padding: 10px 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; background: var(--bg); transition: 0.2s; font-weight: 700; font-size: 14px; }
+.teacher-option:hover { background: #e2e8f0; }
 .teacher-option.selected { background: #eff6ff; color: var(--primary); font-weight: 900; border: 1px solid var(--primary); }
 .multi-select { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
 .chip { padding: 10px 18px; border-radius: 20px; background: var(--bg); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 800; transition: all 0.2s ease; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; }
 .chip.selected { background: #eff6ff; color: var(--primary); border-color: var(--primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15); }
 
-/* الجداول والأقسام */
 .sub-tabs { display: flex; background: var(--bg); border-radius: 14px; padding: 5px; margin-bottom: 20px; }
 .sub-tab-btn { flex: 1; padding: 12px; text-align: center; border: none; background: transparent; font-size: 14px; font-weight: 900; color: var(--text-muted); border-radius: 10px; cursor: pointer; transition: 0.3s; }
 .sub-tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); }
 .filter-tools { background: var(--bg); border-radius: 14px; padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
-/* التعديل لضمان بقاء الفلاتر والجداول داخل الشاشة */
 .quick-filters { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: space-between; overflow: hidden; padding: 0; width: 100%; }
 .quick-filters .btn { flex: 1 1 auto; padding: 8px 0; font-size: 12px; min-width: 18%; text-align: center; justify-content: center; border-radius: 10px;}
 
@@ -167,15 +118,12 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .bg-approved { background: #dcfce7; color: #16a34a; }
 .bg-rejected { background: #fee2e2; color: #dc2626; }
 
-/* النوافذ المنبثقة والتحميل */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
 .modal-content { background: var(--card-bg); width: 100%; max-width: 450px; padding: 30px; border-radius: 24px; position: relative; animation: scaleIn 0.3s ease; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto; overflow-x: hidden; }
 .close-modal { position: absolute; top: 15px; left: 15px; width: 35px; height: 35px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--text-dark); cursor: pointer; transition: 0.2s; }
 .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); display: none; align-items: center; justify-content: center; z-index: 9999; }
 .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* التقرير الشامل */
 .smart-doc-wrapper { background: #fff; padding: 40px; border-radius: 12px; box-shadow: var(--doc-shadow); border: 1px solid #e2e8f0; position: relative; overflow: hidden; background-image: linear-gradient(#f1f5f9 1.5px, transparent 1.5px); background-size: 100% 40px; width: 100%; max-width: 100%; }
 .smart-doc-wrapper::before { content: ''; position: absolute; top: 0; right: 0; width: 10px; height: 100%; background: var(--primary); }
 .doc-header { text-align: center; border-bottom: 4px double var(--border); padding-bottom: 25px; margin-bottom: 30px; position: relative;}
@@ -199,19 +147,16 @@ tr:hover td { background: #f1f5f9; cursor: pointer; }
 .ai-loader { display: none; text-align: center; padding: 40px 20px; }
 .ai-loader i { color: var(--primary); font-size: 40px; animation: spin 2s linear infinite; margin-bottom: 15px; }
 
-/* إعدادات الطباعة و PDF */
 .pdf-mode { padding: 15px !important; box-shadow: none !important; border: none !important; max-width: 100% !important; }
 .pdf-mode::before { display: none !important; }
 .pdf-mode button, .pdf-mode .report-image-placeholder i, .pdf-mode .report-image-placeholder span { display: none !important; }
 .pdf-mode .report-image-placeholder { border: 1px solid #ccc !important; }
 
-/* تنسيق صور المدرس والطالب داخل المودال */
 .student-modal-header { text-align: center; margin-bottom: 15px; }
 .student-modal-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin: 0 auto 10px; display: block; background-color: #f1f5f9; }
 .student-modal-name { margin: 0; font-size: 18px; color: var(--text-dark); }
 .student-modal-code { font-size: 14px; color: var(--text-muted); font-weight: bold; }
 
-/* === الأنماط الجديدة (العرض السردي والتعديل) === */
 .controls-bar { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
 .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -285,10 +230,18 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
           <label>تاريخ الحضور</label>
           <input type="date" id="att-date" class="input-field">
         </div>
+        
+        <div class="input-group" style="z-index: 105;">
+          <label>البحث بالاسم (لإضافة الكود تلقائياً)</label>
+          <input type="text" id="search-student-name" class="input-field" placeholder="🔍 اكتب اسم الطالب هنا للبحث..." oninput="handleStudentSearch()" autocomplete="off">
+          <div id="search-student-dropdown" class="dropdown-list" style="position: absolute; width: 100%; top: 75px; z-index: 106;"></div>
+        </div>
+
         <div class="input-group">
           <label>أكواد الطلاب (جماعي)</label>
           <textarea id="att-student-ids" class="input-field" rows="3" placeholder="أدخل الأكواد متبوعة بمسافة..."></textarea>
         </div>
+        
         <div class="input-group">
           <label>البرامج</label>
           <div class="multi-select" id="prog-chips"></div>
@@ -361,7 +314,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
           </div>
           <div class="table-container">
             <table id="table-students">
-              <thead><tr><th>الكود</th><th>الاسم (والفترة)</th><th>الحضور</th></tr></thead>
+              <thead><tr><th style="width:15%">الكود</th><th style="width:35%">الاسم (والفترة)</th><th style="width:20%">المستوى الحالي</th><th style="width:20%">المستوى الجديد</th><th style="width:10%">الحضور</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -594,16 +547,24 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
 <div class="modal" id="report-filter-modal">
   <div class="modal-content">
     <span class="close-modal" onclick="closeModal('report-filter-modal')"><i class="fas fa-times"></i></span>
-    <h3 style="margin-top: 0; color: var(--text-dark); border-bottom: 2px solid var(--bg); padding-bottom: 15px;"><i class="fas fa-filter text-primary"></i> تخصيص التقرير (إخفاء الأقسام)</h3>
+    <h3 style="margin-top: 0; color: var(--text-dark); border-bottom: 2px solid var(--bg); padding-bottom: 15px;"><i class="fas fa-filter text-primary"></i> تخصيص التقرير</h3>
     <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; font-weight: bold; color: var(--text-dark); font-size: 15px; text-align: right;">
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-kpi" style="width: 18px; height: 18px;"> لوحة مؤشرات الأداء الرئيسية</label>
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-cadres" style="width: 18px; height: 18px;"> تقرير الكوادر</label>
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-students" style="width: 18px; height: 18px;"> تحليل الأداء الطلابي العام</label>
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-teachers" style="width: 18px; height: 18px;"> الأداء الإداري والتدريس (المدرسين)</label>
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-programs" style="width: 18px; height: 18px;"> التقرير الفني (البرامج)</label>
-      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-notes" style="width: 18px; height: 18px;"> التوصيات والملاحظات الإدارية والفنية</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-kpi" style="width: 18px; height: 18px;"> إخفاء لوحة مؤشرات الأداء الرئيسية</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-cadres" style="width: 18px; height: 18px;"> إخفاء تقرير الكوادر</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-students" style="width: 18px; height: 18px;"> إخفاء تحليل الأداء الطلابي العام</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-teachers" style="width: 18px; height: 18px;"> إخفاء الأداء الإداري والتدريس (المدرسين)</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-programs" style="width: 18px; height: 18px;"> إخفاء التقرير الفني (البرامج)</label>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="hide-notes" style="width: 18px; height: 18px;"> إخفاء التوصيات والملاحظات الإدارية والفنية</label>
     </div>
-    <button class="btn btn-primary" style="margin-top: 20px;" onclick="applyReportFilters()">تطبيق التخصيص <i class="fas fa-check"></i></button>
+
+    <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; font-weight: bold; color: var(--text-dark); font-size: 15px; text-align: right;">
+      <label style="display: block; margin-bottom: 10px; color: var(--primary);"><i class="fas fa-layer-group"></i> فلترة التقرير حسب البرامج المحددة:</label>
+      <div id="report-program-filters" style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="color:var(--text-muted); font-size:13px;">جاري تحميل البرامج...</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top: 25px;" onclick="applyReportFilters()">تطبيق التخصيص والفلترة <i class="fas fa-check"></i></button>
   </div>
 </div>
 
@@ -636,8 +597,12 @@ window.onload = () => {
   ).join('');
   
   document.addEventListener('click', function (event) {
-    const isClickInside = document.getElementById('teacher-dropdown-container')?.contains(event.target);
-    if (!isClickInside && document.getElementById('teacher-list-upward')) { document.getElementById('teacher-list-upward').classList.remove('show'); }
+    const isClickInsideTeacher = document.getElementById('teacher-dropdown-container')?.contains(event.target);
+    if (!isClickInsideTeacher && document.getElementById('teacher-list-upward')) { document.getElementById('teacher-list-upward').classList.remove('show'); }
+    
+    // Hide Student Name Dropdown if clicked outside
+    const isClickInsideStudentSearch = document.getElementById('search-student-name')?.contains(event.target) || document.getElementById('search-student-dropdown')?.contains(event.target);
+    if (!isClickInsideStudentSearch && document.getElementById('search-student-dropdown')) { document.getElementById('search-student-dropdown').classList.remove('show'); }
   });
 };
 
@@ -702,11 +667,59 @@ async function fetchDashboard() {
     if (dashboardData.status === 'success') {
       populateTeacherLists(); renderUI(dashboardData.data);
       document.getElementById('report-period-text').innerText = `تقرير عن الفترة: ${startDate} إلى: ${endDate}`;
+      
       let uniquePrograms = [...new Set((dashboardData.data.settings || []).map(s => s.program))];
       document.getElementById('perf-program').innerHTML = '<option value="">اختر البرنامج...</option>' + uniquePrograms.map(p => `<option value="${p}">${p}</option>`).join('');
+      
+      // Populate Report Filters using unique programs
+      document.getElementById('report-program-filters').innerHTML = uniquePrograms.map(p => 
+        `<label style="display: flex; align-items: center; gap: 10px; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);">
+            <input type="checkbox" value="${p}" class="report-prog-checkbox" checked style="width: 18px; height: 18px;">
+            <span style="font-weight: 700;">${p}</span>
+         </label>`
+      ).join('');
+
     }
   } catch (e) { console.error(e); }
   showLoader(false);
+}
+
+// 🔎 Smart Search Inside Code Input Field Implementation (Task 1)
+function handleStudentSearch() {
+  const term = document.getElementById('search-student-name').value.trim().toLowerCase();
+  const dropdown = document.getElementById('search-student-dropdown');
+  
+  if (!term) { dropdown.classList.remove('show'); return; }
+  if (!dashboardData || !dashboardData.data || !dashboardData.data.students) return;
+
+  const matches = dashboardData.data.students.filter(s => s.name && s.name.toLowerCase().includes(term));
+  
+  if (matches.length === 0) { 
+      dropdown.innerHTML = `<div class="teacher-option" style="justify-content:center; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`; 
+      dropdown.classList.add('show'); 
+      return; 
+  }
+
+  dropdown.innerHTML = matches.map(s => `
+    <div class="teacher-option" onclick="appendStudentId('${s.id}')">
+      <span style="font-weight:bold; flex: 1; text-align: right;">${s.name}</span> 
+      <span style="color:var(--primary); font-weight: 900; background: #eff6ff; padding: 2px 8px; border-radius: 8px;">#${s.id}</span>
+    </div>
+  `).join('');
+  dropdown.classList.add('show');
+}
+
+function appendStudentId(id) {
+  const textarea = document.getElementById('att-student-ids');
+  let currentVals = textarea.value.trim().split(/\s+/).filter(v => v);
+  
+  if (!currentVals.includes(id.toString())) {
+    currentVals.push(id);
+    textarea.value = currentVals.join(' ') + ' ';
+  }
+  
+  document.getElementById('search-student-name').value = '';
+  document.getElementById('search-student-dropdown').classList.remove('show');
 }
 
 function applyDateFilter() { fetchDashboard(); }
@@ -779,6 +792,9 @@ async function generateAnalyticalReport() {
   const hidePrograms = document.getElementById('hide-programs') && document.getElementById('hide-programs').checked;
   const hideNotes = document.getElementById('hide-notes') && document.getElementById('hide-notes').checked;
 
+  // Management Report Filter by Selected Programs (Task 2)
+  const selectedReportProgs = Array.from(document.querySelectorAll('.report-prog-checkbox:checked')).map(cb => cb.value);
+
   const startDate = document.getElementById('report-start-date').value || 'بداية الفترة';
   const endDate = document.getElementById('report-end-date').value || 'نهاية الفترة';
   const students = d.students || []; const teachers = d.teachersReport || []; const settings = d.settings || [];
@@ -793,6 +809,24 @@ async function generateAnalyticalReport() {
     if(!hideTeachers) { reportHTML += `<div class="report-stat-card"><span class="rp-value">${teachers.length}</span><span class="rp-label">عدد المدرسين</span></div>`; }
     reportHTML += `</div>`;
     reportHTML += getImageSectionHTML('kpi');
+  }
+
+  // Task 4: Honor Board (Level Change Detection)
+  const upgradedStudents = students.filter(s => s.currentLevel && s.newLevel && s.currentLevel !== s.newLevel);
+  if (upgradedStudents.length > 0) {
+      reportHTML += `<h2><i class="fas fa-award"></i> لوحة الشرف (ترقيات المستويات)</h2>`;
+      reportHTML += `<p>نهنئ الطلاب الذين أظهروا تقدماً متميزاً وانتقلوا إلى مستويات جديدة خلال هذه الفترة:</p>`;
+      reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th style="width:15%">الكود</th><th style="width:40%">اسم الطالب</th><th style="width:20%">المستوى السابق</th><th style="width:25%">المستوى الجديد</th></tr></thead><tbody>`;
+      upgradedStudents.forEach(s => {
+          reportHTML += `<tr>
+              <td><span style="font-weight:bold; color:var(--text-muted)">#${s.id}</span></td>
+              <td style="color:var(--primary); font-weight:900;">${s.name}</td>
+              <td style="font-weight:600;">${s.currentLevel}</td>
+              <td><span class="badge bg-approved" style="font-size:13px; font-weight:900;">${s.newLevel}</span> <i class="fas fa-arrow-up" style="color:var(--success);"></i></td>
+          </tr>`;
+      });
+      reportHTML += `</tbody></table></div>`;
+      reportHTML += getImageSectionHTML('honor-board');
   }
 
   if (!hideCadres) {
@@ -837,7 +871,9 @@ async function generateAnalyticalReport() {
 
   if (!hidePrograms) {
     reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
-    let activeSettings = settings.filter(s => s.count > 0);
+    
+    // Apply Selected Programs Filter from UI Enhancement (Task 2)
+    let activeSettings = settings.filter(s => s.count > 0 && selectedReportProgs.includes(s.program));
     let isNarrative = document.getElementById('narrative-toggle') ? document.getElementById('narrative-toggle').checked : false;
 
     if (activeSettings.length > 0) {
@@ -942,7 +978,11 @@ async function generateAnalyticalReport() {
         }
 
     } else {
-        reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات برامج تفصيلية في هذه الفترة.</p>`;
+        if(selectedReportProgs.length === 0) {
+            reportHTML += `<p style="color:var(--warning); font-style:italic; font-weight:bold;">يرجى اختيار برنامج واحد على الأقل من نافذة (تخصيص التقرير) لعرض الإحصائيات الفنية.</p>`;
+        } else {
+            reportHTML += `<p style="color:var(--text-muted); font-style:italic;">لم يتم تسجيل إحصائيات لهذه البرامج في هذه الفترة.</p>`;
+        }
     }
     
     reportHTML += getImageSectionHTML('programs');
@@ -1074,6 +1114,7 @@ function toggleStudentFilter(type) {
   }
 }
 
+// Ensure Task 3 Columns are rendered
 function renderStudentsTable() {
   if (!dashboardData || !dashboardData.data) return;
   const term = document.getElementById('student-search').value.toLowerCase();
@@ -1097,7 +1138,16 @@ function renderStudentsTable() {
   });
 
   if (activeStudentFilters.has('top')) { filtered.sort((a, b) => b.days - a.days); }
-  document.querySelector('#table-students tbody').innerHTML = filtered.map(s => `<tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'><td style="font-weight:900; color:var(--primary)">${s.id}</td><td style="font-weight:700;">${s.name} <br><span style="font-size:11px; color:var(--text-muted);">${s.shift}</span></td><td><span class="badge bg-approved" style="font-size:13px;">${s.days} يوم</span></td></tr>`).join('');
+  
+  document.querySelector('#table-students tbody').innerHTML = filtered.map(s => `
+    <tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
+        <td style="font-weight:900; color:var(--primary)">${s.id}</td>
+        <td style="font-weight:700;">${s.name} <br><span style="font-size:11px; color:var(--text-muted);">${s.shift}</span></td>
+        <td style="font-weight:600;">${s.currentLevel || '-'}</td>
+        <td style="font-weight:700; color:var(--info);">${s.newLevel || '-'}</td>
+        <td><span class="badge bg-approved" style="font-size:13px;">${s.days} يوم</span></td>
+    </tr>
+  `).join('');
 }
 
 function toggleChip(el) { el.classList.toggle('selected'); }
@@ -1164,19 +1214,16 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); reg.addEventListener('updatefound', () => { const newWorker = reg.installing; newWorker.addEventListener('statechange', () => { if (newWorker.state === 'installed' && navigator.serviceWorker.controller) { newWorker.postMessage({ action: 'SKIP_WAITING' }); } }); }); }); let refreshing = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { refreshing = true; window.location.reload(); } }); });
 }
 
-// === الدالة الجديدة الخاصة بوضع التعديل اليدوي ===
 function toggleEditMode() {
     const reportContainer = document.getElementById('smart-report-container');
     const isEditing = document.body.getAttribute('data-editing') === 'true';
 
     if (isEditing) {
-        // إيقاف التعديل
         reportContainer.setAttribute('contenteditable', 'false');
         reportContainer.style.border = '';
         document.body.setAttribute('data-editing', 'false');
         alert('تم إغلاق وضع التعديل اليدوي.');
     } else {
-        // تفعيل التعديل
         reportContainer.setAttribute('contenteditable', 'true');
         reportContainer.style.border = '2px dashed var(--warning)';
         document.body.setAttribute('data-editing', 'true');
