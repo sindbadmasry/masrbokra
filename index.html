@@ -225,7 +225,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
       </div>
 
       <div class="card">
-        <div class="card-title"><i class="fas fa-user-edit"></i> لوحة تسجيل الحضور والتوصيات</div>
+        <div class="card-title"><i class="fas fa-user-edit"></i> لوحة تسجيل الحضور</div>
         <div class="input-group">
           <label>تاريخ الحضور</label>
           <input type="date" id="att-date" class="input-field">
@@ -246,10 +246,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
           <label>البرامج</label>
           <div class="multi-select" id="prog-chips"></div>
         </div>
-        <div class="input-group">
-          <label style="color: var(--primary);">التوصيات (تُدرج في التقرير الشامل)</label>
-          <textarea id="prog-notes" class="input-field" rows="3" placeholder="اكتب التوصيات والملاحظات الإدارية والفنية هنا..."></textarea>
-        </div>
+        
         <div class="input-group">
           <label>المدرسين</label>
           <div class="custom-dropdown" id="teacher-dropdown-container">
@@ -270,21 +267,15 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
 
     <div id="view-reports" class="view" style="display:none;">
       <div class="filter-tools">
-        <label style="font-weight:800; font-size:14px; width:100%;"><i class="fas fa-calendar-alt" style="color:var(--primary);"></i> الفلترة بتاريخ</label>
+        <div style="width: 100%; display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn btn-outline" style="flex:1; padding: 10px; font-size: 14px; border-color: var(--primary); color: var(--primary);" onclick="setFilterToToday()">إحصائيات اليوم <i class="fas fa-calendar-day"></i></button>
+            <button class="btn btn-outline" style="flex:1; padding: 10px; font-size: 14px;" onclick="setFilterToMonth()">إحصائيات الشهر <i class="fas fa-calendar-alt"></i></button>
+        </div>
+        
+        <label style="font-weight:800; font-size:14px; width:100%;"><i class="fas fa-filter" style="color:var(--primary);"></i> الفلترة بتواريخ مخصصة</label>
         <input type="date" id="report-start-date" class="input-field" style="flex:1; min-width:120px;">
         <input type="date" id="report-end-date" class="input-field" style="flex:1; min-width:120px;">
-        <button class="btn btn-primary" style="width:auto; padding: 13px 20px;" onclick="applyDateFilter()">تطبيق <i class="fas fa-filter"></i></button>
-         <div id="attendance-count" style="
-background:#eff6ff;
-color:#2563eb;
-padding:6px 12px;
-border-radius:10px;
-font-weight:800;
-font-size:12px;
-display:inline-block;
-margin-bottom:10px;">
-عدد الحضور: 0
-</div>
+        <button class="btn btn-primary" style="width:auto; padding: 13px 20px;" onclick="applyDateFilter()">تطبيق</button>
       </div>
       <div class="sub-tabs" id="reports-sub-tabs">
         <button class="sub-tab-btn active" onclick="switchSubTab('students')" id="tab-btn-students">الطلاب</button>
@@ -294,7 +285,10 @@ margin-bottom:10px;">
       
       <div id="sub-view-students" class="sub-view">
         <div class="card">
-          <div class="card-title"><i class="fas fa-users"></i> إحصائيات الطلاب</div>
+          <div class="card-title">
+            <span><i class="fas fa-users"></i> إحصائيات الطلاب</span>
+            <span id="visible-student-count" class="badge" style="margin-right: auto; background: var(--primary); color: white; font-size: 13px; padding: 5px 12px;">0 طالب</span>
+          </div>
          <div class="quick-filters-wrapper">
   <div class="segmented-control" id="student-filters-container">
     <button class="control-item active" id="filter-all" onclick="toggleStudentFilter('all')">
@@ -484,6 +478,11 @@ margin-bottom:10px;">
             <input type="text" id="perf-new-level" class="input-field" placeholder="المستوى (مثال: مستوى أول، متقدم...)">
         </div>
     </div>
+    
+    <div class="input-group" style="margin-top: 15px;">
+        <label style="color: var(--primary);">التوصيات (تُدرج في التقرير الشامل)</label>
+        <textarea id="prog-notes" class="input-field" rows="3" placeholder="اكتب التوصيات والملاحظات الإدارية والفنية هنا..."></textarea>
+    </div>
 
     <button class="btn btn-warning" onclick="submitPerformanceData()" style="margin-top: 15px;">
       تسجيل الإنجاز <i class="fas fa-save"></i>
@@ -625,14 +624,30 @@ window.onload = () => {
   });
 };
 
-function setDefaultDates(){
-  const d=new Date(),f=n=>('0'+n).slice(-2),t=x=>x.getFullYear()+'-'+f(x.getMonth()+1)+'-'+f(x.getDate());
-  report-start-date.value=report-end-date.value=t(d)
+function setFilterToToday() {
+  const now = new Date();
+  const toISODate = (d) => { const z = n => ('0' + n).slice(-2); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+  const todayStr = toISODate(now);
+  document.getElementById('report-start-date').value = todayStr;
+  document.getElementById('report-end-date').value = todayStr;
+  applyDateFilter();
 }
-function updateAttendanceCount(){
-  const rows=document.querySelectorAll('#table-students tbody tr')
-  document.getElementById('attendance-count').textContent='عدد الحضور: '+rows.length
+
+function setFilterToMonth() {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const toISODate = (d) => { const z = n => ('0' + n).slice(-2); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+  document.getElementById('report-start-date').value = toISODate(firstDay);
+  document.getElementById('report-end-date').value = toISODate(lastDay);
+  applyDateFilter();
 }
+
+// تم جعل "اليوم" هو الفلتر الافتراضي عند فتح الصفحة
+function setDefaultDates() {
+  setFilterToToday();
+}
+
 function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
 
 async function handleLogin() {
@@ -760,7 +775,6 @@ function populateTeacherLists() {
 function renderUI(d) {
   if (currentUser.role === 'Admin') { document.getElementById('header-pending-count').innerText = d.pendingLeavesCount || 0; }
   renderStudentsTable();
-  
   if (currentUser.role === 'Admin' && d.programs) { document.querySelector('#table-programs tbody').innerHTML = d.programs.map(p => `<tr><td style="font-weight:800;">${p.name}</td><td><span class="badge bg-approved">${p.days} يوم</span></td></tr>`).join(''); }
   if (currentUser.role === 'Admin' && d.teachersReport) {
     document.querySelector('#table-teachers-report tbody').innerHTML = d.teachersReport.map(t => `<tr onclick='openTeacherProfileModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'><td style="font-weight:800; color: var(--info);"><i class="fas fa-user-circle"></i> ${t.name}</td><td style="color:var(--success); font-weight:900;">${t.presentDays || 0}</td><td style="color:var(--danger); font-weight:900;">${t.absentDays || 0}</td><td style="color:var(--warning); font-weight:900;">${t.leaveDays || 0}</td></tr>`).join('');
@@ -845,7 +859,11 @@ async function generateAnalyticalReport() {
               <td><span style="font-weight:bold; color:var(--text-muted)">#${s.id}</span></td>
               <td style="color:var(--primary); font-weight:900;">${s.name}</td>
               <td style="font-weight:600;">${s.currentLevel}</td>
-              <td><span class="badge bg-approved" style="font-size:13px; font-weight:900;">${s.newLevel}</span> <i class="fas fa-arrow-up" style="color:var(--success);"></i></td>
+              <td>
+                  <span class="badge bg-approved" style="font-size:13px; font-weight:900;">${s.newLevel}</span> 
+                  <i class="fas fa-arrow-up" style="color:var(--success);"></i>
+                  <button class="no-print" onclick="this.closest('tr').remove()" style="background:none; border:none; color:var(--danger); cursor:pointer; float:left; padding: 2px 8px;" title="إزالة من التقرير"><i class="fas fa-trash-alt"></i></button>
+              </td>
           </tr>`;
       });
       reportHTML += `</tbody></table></div>`;
@@ -1069,6 +1087,8 @@ async function submitPerformanceData() {
   const keywords = Array.from(chips).map(c => c.getAttribute('data-val'));
   const newActivity = document.getElementById('perf-new-activity').value.trim();
   const newLevel = document.getElementById('perf-new-level').value.trim();
+  // تم نقل قراءة التوصيات لترسل مع بيانات الأداء
+  const notes = document.getElementById('prog-notes').value.trim();
 
   if(!date || !prog) return alert("يرجى اختيار التاريخ والبرنامج.");
   if(keywords.length === 0 && !newActivity) return alert("يرجى اختيار نشاط من القائمة أو إدخال نشاط جديد يدوياً.");
@@ -1084,12 +1104,14 @@ async function submitPerformanceData() {
               program: prog, 
               keywords: keywords,
               newActivity: newActivity,
-              newLevel: newLevel
+              newLevel: newLevel,
+              notes: notes // إرسال التوصيات
           }) 
       }); 
       alert("تم الحفظ بنجاح"); 
       document.getElementById('perf-new-activity').value = "";
       document.getElementById('perf-new-level').value = "";
+      document.getElementById('prog-notes').value = ""; // تفريغ حقل التوصيات بعد الحفظ
       closeModal('performance-modal'); 
       fetchDashboard(); 
   } catch (e) { alert("حدث خطأ."); }
@@ -1160,6 +1182,12 @@ function renderStudentsTable() {
 
   if (activeStudentFilters.has('top')) { filtered.sort((a, b) => b.days - a.days); }
   
+  // تحديث عدد الطلاب الظاهرين في البادج
+  const countBadge = document.getElementById('visible-student-count');
+  if (countBadge) {
+      countBadge.innerText = filtered.length + ' طالب';
+  }
+  
   document.querySelector('#table-students tbody').innerHTML = filtered.map(s => `
     <tr onclick='openStudentModal(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
         <td style="font-weight:900; color:var(--primary)">${s.id}</td>
@@ -1188,7 +1216,7 @@ function openTeacherProfileModal(teacherObj) {
 function openStudentModal(studentObj) {
   document.getElementById('modal-name').innerText = studentObj.name; 
   document.getElementById('modal-code').innerText = "كود: " + studentObj.id;
-  document.getElementById('modal-code').setAttribute('data-id', studentObj.id); // لحفظ الكود الأساسي لاستخدامه في التحديث
+  document.getElementById('modal-code').setAttribute('data-id', studentObj.id);
 
   const studentImg = document.getElementById('modal-img'); 
   if (studentImg) { 
@@ -1199,7 +1227,6 @@ function openStudentModal(studentObj) {
   document.getElementById('modal-days').innerText = studentObj.days || 0; 
   document.getElementById('modal-lecs').innerText = studentObj.lectures || 0;
 
-  // إصلاح تعبئة مستوى الطالب من البيانات القادمة من الباك إند
   document.getElementById('modal-student-level').value = studentObj.newLevel || studentObj.currentLevel || ""; 
 
   const progsDiv = document.getElementById('modal-programs-list'); 
@@ -1223,12 +1250,13 @@ async function submitAttendance() {
   const ids = document.getElementById('att-student-ids').value; const date = document.getElementById('att-date').value;
   const selectedProgsBase = Array.from(document.querySelectorAll('#prog-chips .chip.selected')).map(c => c.getAttribute('data-val'));
   const selectedTeachers = Array.from(document.querySelectorAll('#teacher-list-upward .teacher-option.selected')).map(c => c.getAttribute('data-val'));
-  const extraInfo = document.getElementById('prog-notes').value.trim(); 
+  
   if (!ids || !date || selectedProgsBase.length === 0 || selectedTeachers.length === 0) { return alert("يرجى إكمال البيانات الأساسية (الطلاب، البرامج، والمدرسين)."); }
   showLoader(true);
   try {
-    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'submitAttendance', ids: ids, customDate: date, programs: selectedProgsBase.join(" - "), teachers: selectedTeachers.join(" - "), notes: extraInfo }) });
-    alert("تم إرسال كشف الحضور بنجاح"); document.getElementById('att-student-ids').value = ""; document.getElementById('prog-notes').value = ""; document.getElementById('teacher-list-upward').classList.remove('show'); fetchDashboard();
+    // تم تفريغ الحقل notes من هنا لعدم تعارضه مع الأداء اليومي
+    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'submitAttendance', ids: ids, customDate: date, programs: selectedProgsBase.join(" - "), teachers: selectedTeachers.join(" - "), notes: "" }) });
+    alert("تم إرسال كشف الحضور بنجاح"); document.getElementById('att-student-ids').value = ""; document.getElementById('teacher-list-upward').classList.remove('show'); fetchDashboard();
   } catch (e) { alert("حدث خطأ أثناء إرسال البيانات."); } showLoader(false);
 }
 
@@ -1269,7 +1297,7 @@ async function updateStudentLevel() {
         const res = await response.json();
         if (res.status === 'success') {
             alert("تم تحديث المستوى بنجاح");
-            fetchDashboard(); // تحديث صامت للبيانات في الخلفية
+            fetchDashboard(); 
         } else {
             alert("خطأ في التحديث: " + res.message);
         }
