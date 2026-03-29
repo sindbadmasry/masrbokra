@@ -760,7 +760,7 @@ function populateTeacherLists() {
 function renderUI(d) {
   if (currentUser.role === 'Admin') { document.getElementById('header-pending-count').innerText = d.pendingLeavesCount || 0; }
   renderStudentsTable();
-  updateAttendanceCount();
+  
   if (currentUser.role === 'Admin' && d.programs) { document.querySelector('#table-programs tbody').innerHTML = d.programs.map(p => `<tr><td style="font-weight:800;">${p.name}</td><td><span class="badge bg-approved">${p.days} يوم</span></td></tr>`).join(''); }
   if (currentUser.role === 'Admin' && d.teachersReport) {
     document.querySelector('#table-teachers-report tbody').innerHTML = d.teachersReport.map(t => `<tr onclick='openTeacherProfileModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'><td style="font-weight:800; color: var(--info);"><i class="fas fa-user-circle"></i> ${t.name}</td><td style="color:var(--success); font-weight:900;">${t.presentDays || 0}</td><td style="color:var(--danger); font-weight:900;">${t.absentDays || 0}</td><td style="color:var(--warning); font-weight:900;">${t.leaveDays || 0}</td></tr>`).join('');
