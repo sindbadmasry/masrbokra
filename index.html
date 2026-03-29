@@ -754,9 +754,8 @@ function handleStudentSearch() {
 
   if (!dashboardData || !dashboardData.data) return;
 
-  // التعديل: البحث في القائمة الكاملة التي أضفناها في الباك إند
-  // نستخدم allStudentsList لضمان ظهور الجميع حتى من لم يحضروا
-  const sourceList = dashboardData.data.allStudentsList || [];
+  // التعديل هنا: استخدمنا allStudents لتتطابق مع الـ JSON القادم من الباك إند
+  const sourceList = dashboardData.data.allStudents || [];
 
   const matches = sourceList.filter(s => {
       const sName = s.name ? s.name.toLowerCase() : "";
@@ -770,7 +769,7 @@ function handleStudentSearch() {
       return; 
   }
 
-  dropdown.innerHTML = matches.slice(0, 3).map(s => `
+  dropdown.innerHTML = matches.slice(0, 15).map(s => `
     <div class="teacher-option" onclick="appendStudentId('${s.id}')">
       <span style="font-weight:bold; flex: 1; text-align: right;">${s.name}</span> 
       <span style="color:var(--primary); font-weight: 900; background: #eff6ff; padding: 2px 8px; border-radius: 8px;">#${s.id}</span>
@@ -779,8 +778,7 @@ function handleStudentSearch() {
   
   dropdown.classList.add('show');
 }
-
-function appendStudentId(id) {
+  function appendStudentId(id) {
   const textarea = document.getElementById('att-student-ids');
   let currentVals = textarea.value.trim().split(/\s+/).filter(v => v);
   
