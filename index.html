@@ -744,57 +744,40 @@ async function fetchDashboard() {
  * تبحث في الاسم والكود وتتجاهل الفلاتر الحالية لضمان الوصول لكل الأسماء
  */
 function handleStudentSearch() {
-    const inputField = document.getElementById('search-student-name');
-    const dropdown = document.getElementById('search-student-dropdown');
-    const term = inputField.value.trim().toLowerCase();
+  const term = document.getElementById('search-student-name').value.trim().toLowerCase();
+  const dropdown = document.getElementById('search-student-dropdown');
+  
+  if (!term) { 
+    dropdown.classList.remove('show'); 
+    return; 
+  }
 
-    // 1. إغلاق القائمة إذا كان الحقل فارغاً
-    if (!term) {
-        dropdown.classList.remove('show');
-        dropdown.innerHTML = '';
-        return;
-    }
+  if (!dashboardData || !dashboardData.data) return;
 
-    // 2. التحقق من وجود البيانات الأصلية
-    if (!dashboardData || !dashboardData.data || !dashboardData.data.students) {
-        console.warn("بيانات الطلاب لم يتم تحميلها بعد من الخادم.");
-        return;
-    }
+  // التعديل: البحث في القائمة الكاملة التي أضفناها في الباك إند
+  // نستخدم allStudentsList لضمان ظهور الجميع حتى من لم يحضروا
+  const sourceList = dashboardData.data.allStudentsList || [];
 
-    // 3. مصدر البيانات: نستخدم المصفوفة الكاملة القادمة من الباك إند مباشرة
-    const allStudents = dashboardData.data.students;
+  const matches = sourceList.filter(s => {
+      const sName = s.name ? s.name.toLowerCase() : "";
+      const sId = s.id ? s.id.toString() : "";
+      return sName.includes(term) || sId.includes(term);
+  });
+  
+  if (matches.length === 0) { 
+      dropdown.innerHTML = `<div class="teacher-option" style="justify-content:center; color:var(--text-muted); padding:10px;">لا توجد نتائج في قاعدة البيانات</div>`; 
+      dropdown.classList.add('show'); 
+      return; 
+  }
 
-    // 4. منطق التصفية (البحث بالاسم أو الكود)
-    const matches = allStudents.filter(student => {
-        const nameMatch = student.name && student.name.toLowerCase().includes(term);
-        const idMatch = student.id && student.id.toString().includes(term);
-        return nameMatch || idMatch;
-    });
-
-    // 5. عرض النتائج أو رسالة "لا يوجد"
-    if (matches.length === 0) {
-        dropdown.innerHTML = `
-            <div class="teacher-option" style="justify-content:center; color:var(--text-muted); cursor:default; padding:12px;">
-                <i class="fas fa-search-minus" style="margin-left:8px;"></i>
-                لم يتم العثور على نتائج مطابقة
-            </div>`;
-    } else {
-        // نحدد العرض بـ 10 نتائج فقط لسرعة الاستجابة وشكل الواجهة
-        dropdown.innerHTML = matches.slice(0, 10).map(student => `
-            <div class="teacher-option" onclick="appendStudentId('${student.id}')" title="اضغط للإضافة لقائمة الحضور">
-                <div style="display:flex; align-items:center; gap:12px; width:100%;">
-                    <i class="fas fa-user-graduate" style="color:var(--primary); opacity:0.7;"></i>
-                    <span style="flex:1; font-weight:600; text-align:right; font-size:0.95rem;">${student.name}</span>
-                    <span style="background:var(--bg); color:var(--primary); padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.8rem; border:1px solid #e2e8f0;">
-                        #${student.id}
-                    </span>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // 6. إظهار القائمة المنسدلة
-    dropdown.classList.add('show');
+  dropdown.innerHTML = matches.slice(0, 3).map(s => `
+    <div class="teacher-option" onclick="appendStudentId('${s.id}')">
+      <span style="font-weight:bold; flex: 1; text-align: right;">${s.name}</span> 
+      <span style="color:var(--primary); font-weight: 900; background: #eff6ff; padding: 2px 8px; border-radius: 8px;">#${s.id}</span>
+    </div>
+  `).join('');
+  
+  dropdown.classList.add('show');
 }
 
 function appendStudentId(id) {
