@@ -1,5 +1,5 @@
 // اسم إصدار الكاش (قم بتغيير الرقم عند إجراء تحديثات كبيرة على ملفات HTML/CSS/JS)
-const CACHE_NAME = 'app-cache-v5';
+const CACHE_NAME = 'app-cache-v5.1';
 
 // الملفات الأساسية التي نريد الاحتفاظ بها ليعمل التطبيق بدون إنترنت
 const urlsToCache = [
