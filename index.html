@@ -274,6 +274,17 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
         <input type="date" id="report-start-date" class="input-field" style="flex:1; min-width:120px;">
         <input type="date" id="report-end-date" class="input-field" style="flex:1; min-width:120px;">
         <button class="btn btn-primary" style="width:auto; padding: 13px 20px;" onclick="applyDateFilter()">تطبيق <i class="fas fa-filter"></i></button>
+         <div id="attendance-count" style="
+background:#eff6ff;
+color:#2563eb;
+padding:6px 12px;
+border-radius:10px;
+font-weight:800;
+font-size:12px;
+display:inline-block;
+margin-bottom:10px;">
+عدد الحضور: 0
+</div>
       </div>
       <div class="sub-tabs" id="reports-sub-tabs">
         <button class="sub-tab-btn active" onclick="switchSubTab('students')" id="tab-btn-students">الطلاب</button>
@@ -618,7 +629,10 @@ function setDefaultDates(){
   const d=new Date(),f=n=>('0'+n).slice(-2),t=x=>x.getFullYear()+'-'+f(x.getMonth()+1)+'-'+f(x.getDate());
   report-start-date.value=report-end-date.value=t(d)
 }
-
+function updateAttendanceCount(){
+  const rows=document.querySelectorAll('#table-students tbody tr')
+  document.getElementById('attendance-count').textContent='عدد الحضور: '+rows.length
+}
 function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
 
 async function handleLogin() {
@@ -746,6 +760,7 @@ function populateTeacherLists() {
 function renderUI(d) {
   if (currentUser.role === 'Admin') { document.getElementById('header-pending-count').innerText = d.pendingLeavesCount || 0; }
   renderStudentsTable();
+  updateAttendanceCount();
   if (currentUser.role === 'Admin' && d.programs) { document.querySelector('#table-programs tbody').innerHTML = d.programs.map(p => `<tr><td style="font-weight:800;">${p.name}</td><td><span class="badge bg-approved">${p.days} يوم</span></td></tr>`).join(''); }
   if (currentUser.role === 'Admin' && d.teachersReport) {
     document.querySelector('#table-teachers-report tbody').innerHTML = d.teachersReport.map(t => `<tr onclick='openTeacherProfileModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'><td style="font-weight:800; color: var(--info);"><i class="fas fa-user-circle"></i> ${t.name}</td><td style="color:var(--success); font-weight:900;">${t.presentDays || 0}</td><td style="color:var(--danger); font-weight:900;">${t.absentDays || 0}</td><td style="color:var(--warning); font-weight:900;">${t.leaveDays || 0}</td></tr>`).join('');
