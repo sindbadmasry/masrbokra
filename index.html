@@ -91,7 +91,7 @@ header { background: var(--card-bg); color: var(--text-dark); padding: 15px 20px
 
 .custom-dropdown { position: relative; width: 100%; }
 .dropdown-header { padding: 14px 16px; border: 2px solid var(--border); border-radius: 14px; background: #f1f5f9; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; color: var(--text-muted); transition: 0.3s; }
-.dropdown-list { display: none; position: absolute; bottom: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15); max-height: 220px; overflow-y: auto; z-index: 100; margin-bottom: 8px; padding: 10px; flex-direction: column; gap: 5px; }
+.dropdown-list { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15); max-height: 220px; overflow-y: auto; z-index: 200; margin-top: 5px; padding: 10px; flex-direction: column; gap: 5px; }
 .dropdown-list.show { display: flex; animation: fadeIn 0.2s ease; }
 .teacher-option { padding: 10px 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; background: var(--bg); transition: 0.2s; font-weight: 700; font-size: 14px; }
 .teacher-option:hover { background: #e2e8f0; }
@@ -232,9 +232,9 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
         </div>
         
         <div class="input-group" style="z-index: 105;">
-          <label>البحث بالاسم (لإضافة الكود تلقائياً)</label>
-          <input type="text" id="search-student-name" class="input-field" placeholder="🔍 اكتب اسم الطالب هنا للبحث..." oninput="handleStudentSearch()" autocomplete="off">
-          <div id="search-student-dropdown" class="dropdown-list" style="position: absolute; width: 100%; top: 75px; z-index: 106;"></div>
+          <label>البحث بالاسم أو الكود (لإضافة الكود تلقائياً)</label>
+          <input type="text" id="search-student-name" class="input-field" placeholder="🔍 اكتب اسم الطالب أو كوده للبحث..." oninput="handleStudentSearch()" autocomplete="off">
+          <div id="search-student-dropdown" class="dropdown-list"></div>
         </div>
 
         <div class="input-group">
@@ -257,7 +257,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
               <span>اختر المدرسين...</span>
               <i class="fas fa-chevron-up"></i>
             </div>
-            <div class="dropdown-list" id="teacher-list-upward">
+            <div class="dropdown-list" id="teacher-list-upward" style="top: 100%;">
               <div style="font-size: 13px; color: var(--text-muted); text-align: center;">جاري التحميل...</div>
             </div>
           </div>
@@ -486,7 +486,7 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
     <div class="student-modal-header">
       <img id="modal-img" class="student-modal-img" src="https://via.placeholder.com/150">
       <h3 id="modal-name" class="student-modal-name">اسم الطالب</h3>
-      <div id="modal-code" class="student-modal-code">كود: #</div>
+      <div id="modal-code" class="student-modal-code" data-id="">كود: #</div>
     </div>
     <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
       <div class="stat-item" style="padding: 15px;"><span class="value" id="modal-days" style="color: var(--primary);">0</span><span class="label">أيام الحضور</span></div>
@@ -494,20 +494,15 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
     </div>
     <div style="margin-top: 20px;">
       <label style="font-weight: 800; font-size: 14px; margin-bottom: 10px; display: block;">البرامج المشارك فيها:</label>
-      <div style="margin-top: 20px;">
-  <label style="font-weight: 800; font-size: 14px; margin-bottom: 10px; display: block;">البرامج المشارك فيها:</label>
-  <div class="multi-select" id="modal-programs-list" style="pointer-events: none;"></div>
-</div>
-
-<div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
-    <label style="font-weight: 800; font-size: 14px; margin-bottom: 8px; display: block;">تعديل مستوى الطالب:</label>
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="modal-student-level" class="input-field" placeholder="أدخل المستوى هنا..." style="flex: 1;">
-        <button class="btn btn-primary" onclick="updateStudentLevel()" style="width: auto; padding: 10px 15px; font-size: 14px;">حفظ</button>
-    </div>
-</div>
-
       <div class="multi-select" id="modal-programs-list" style="pointer-events: none;"></div>
+    </div>
+
+    <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+        <label style="font-weight: 800; font-size: 14px; margin-bottom: 8px; display: block;">تعديل مستوى الطالب:</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="modal-student-level" class="input-field" placeholder="أدخل المستوى هنا..." style="flex: 1;">
+            <button class="btn btn-primary" onclick="updateStudentLevel()" style="width: auto; padding: 10px 15px; font-size: 14px;">حفظ</button>
+        </div>
     </div>
   </div>
 </div>
@@ -613,7 +608,7 @@ window.onload = () => {
     const isClickInsideTeacher = document.getElementById('teacher-dropdown-container')?.contains(event.target);
     if (!isClickInsideTeacher && document.getElementById('teacher-list-upward')) { document.getElementById('teacher-list-upward').classList.remove('show'); }
     
-    // Hide Student Name Dropdown if clicked outside
+    // إخفاء قائمة الطلاب في حال الضغط بالخارج
     const isClickInsideStudentSearch = document.getElementById('search-student-name')?.contains(event.target) || document.getElementById('search-student-dropdown')?.contains(event.target);
     if (!isClickInsideStudentSearch && document.getElementById('search-student-dropdown')) { document.getElementById('search-student-dropdown').classList.remove('show'); }
   });
@@ -684,7 +679,6 @@ async function fetchDashboard() {
       let uniquePrograms = [...new Set((dashboardData.data.settings || []).map(s => s.program))];
       document.getElementById('perf-program').innerHTML = '<option value="">اختر البرنامج...</option>' + uniquePrograms.map(p => `<option value="${p}">${p}</option>`).join('');
       
-      // Populate Report Filters using unique programs
       document.getElementById('report-program-filters').innerHTML = uniquePrograms.map(p => 
         `<label style="display: flex; align-items: center; gap: 10px; cursor: pointer; background: #f8fafc; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);">
             <input type="checkbox" value="${p}" class="report-prog-checkbox" checked style="width: 18px; height: 18px;">
@@ -697,7 +691,7 @@ async function fetchDashboard() {
   showLoader(false);
 }
 
-// 🔎 Smart Search Inside Code Input Field Implementation (Task 1)
+// بحث ذكي محسّن للاسم أو الكود مع قائمة منسدلة
 function handleStudentSearch() {
   const term = document.getElementById('search-student-name').value.trim().toLowerCase();
   const dropdown = document.getElementById('search-student-dropdown');
@@ -705,10 +699,13 @@ function handleStudentSearch() {
   if (!term) { dropdown.classList.remove('show'); return; }
   if (!dashboardData || !dashboardData.data || !dashboardData.data.students) return;
 
-  const matches = dashboardData.data.students.filter(s => s.name && s.name.toLowerCase().includes(term));
+  const matches = dashboardData.data.students.filter(s => 
+      (s.name && s.name.toLowerCase().includes(term)) || 
+      (s.id && s.id.toString().includes(term))
+  );
   
   if (matches.length === 0) { 
-      dropdown.innerHTML = `<div class="teacher-option" style="justify-content:center; color:var(--text-muted);">لا توجد نتائج مطابقة</div>`; 
+      dropdown.innerHTML = `<div class="teacher-option" style="justify-content:center; color:var(--text-muted); cursor:default;">لا توجد نتائج مطابقة</div>`; 
       dropdown.classList.add('show'); 
       return; 
   }
@@ -805,7 +802,6 @@ async function generateAnalyticalReport() {
   const hidePrograms = document.getElementById('hide-programs') && document.getElementById('hide-programs').checked;
   const hideNotes = document.getElementById('hide-notes') && document.getElementById('hide-notes').checked;
 
-  // Management Report Filter by Selected Programs (Task 2)
   const selectedReportProgs = Array.from(document.querySelectorAll('.report-prog-checkbox:checked')).map(cb => cb.value);
 
   const startDate = document.getElementById('report-start-date').value || 'بداية الفترة';
@@ -824,7 +820,7 @@ async function generateAnalyticalReport() {
     reportHTML += getImageSectionHTML('kpi');
   }
 
-  // Task 4: Honor Board (Level Change Detection)
+  // Honor Board
   const upgradedStudents = students.filter(s => s.currentLevel && s.newLevel && s.currentLevel !== s.newLevel);
   if (upgradedStudents.length > 0) {
       reportHTML += `<h2><i class="fas fa-award"></i> لوحة الشرف (ترقيات المستويات)</h2>`;
@@ -885,7 +881,6 @@ async function generateAnalyticalReport() {
   if (!hidePrograms) {
     reportHTML += `<h2><i class="fas fa-chart-line"></i> التقرير الفني (البرامج)</h2>`;
     
-    // Apply Selected Programs Filter from UI Enhancement (Task 2)
     let activeSettings = settings.filter(s => s.count > 0 && selectedReportProgs.includes(s.program));
     let isNarrative = document.getElementById('narrative-toggle') ? document.getElementById('narrative-toggle').checked : false;
 
@@ -1127,7 +1122,6 @@ function toggleStudentFilter(type) {
   }
 }
 
-// Ensure Task 3 Columns are rendered
 function renderStudentsTable() {
   if (!dashboardData || !dashboardData.data) return;
   const term = document.getElementById('student-search').value.toLowerCase();
@@ -1178,15 +1172,33 @@ function openTeacherProfileModal(teacherObj) {
 }
 
 function openStudentModal(studentObj) {
-  document.getElementById('modal-name').innerText = studentObj.name; document.getElementById('modal-code').innerText = "كود: " + studentObj.id;
-  const studentImg = document.getElementById('modal-img'); if (studentImg) { studentImg.src = `https://sindbadmasry.github.io/masrbokra/images/${studentObj.id}.jpg`; studentImg.onerror = function() { this.src = "https://via.placeholder.com/150?text=No+Photo"; }; }
-  document.getElementById('modal-days').innerText = studentObj.days || 0; document.getElementById('modal-lecs').innerText = studentObj.lectures || 0;
-  const progsDiv = document.getElementById('modal-programs-list'); if (progsDiv) { const counts = {}; const progsArray = Array.isArray(studentObj.programs) ? studentObj.programs : []; progsArray.forEach(p => { counts[p] = (counts[p] || 0) + 1; }); progsDiv.innerHTML = Object.keys(counts).map(p => { let pData = PROGRAMS_LIST.find(pl => pl.name === p) || { icon: 'fa-check', color: '#4f46e5' }; return `<div class="chip selected" style="padding: 6px 14px; font-size:13px; font-weight:800; border-color:${pData.color}; color:${pData.color}; background: #f8fafc; display: flex; align-items: center; gap: 8px;"><i class="fas ${pData.icon}"></i> <span>${p}</span><span style="background:${pData.color}; color:white; border-radius:10px; padding: 2px 8px; font-size:11px; min-width: 20px; text-align: center;">${counts[p]}</span></div>`; }).join(''); }
-  document.getElementById('student-modal').style.display = 'flex';
-  // داخل دالة openStudentModal
-document.getElementById('modal-student-level').value = student.level || ""; 
-// ملاحظة: تأكد من اسم الخاصية في بيانات الطالب (level أو currentLevel)
+  document.getElementById('modal-name').innerText = studentObj.name; 
+  document.getElementById('modal-code').innerText = "كود: " + studentObj.id;
+  document.getElementById('modal-code').setAttribute('data-id', studentObj.id); // لحفظ الكود الأساسي لاستخدامه في التحديث
 
+  const studentImg = document.getElementById('modal-img'); 
+  if (studentImg) { 
+      studentImg.src = `https://sindbadmasry.github.io/masrbokra/images/${studentObj.id}.jpg`; 
+      studentImg.onerror = function() { this.src = "https://via.placeholder.com/150?text=No+Photo"; }; 
+  }
+  
+  document.getElementById('modal-days').innerText = studentObj.days || 0; 
+  document.getElementById('modal-lecs').innerText = studentObj.lectures || 0;
+
+  // إصلاح تعبئة مستوى الطالب من البيانات القادمة من الباك إند
+  document.getElementById('modal-student-level').value = studentObj.newLevel || studentObj.currentLevel || ""; 
+
+  const progsDiv = document.getElementById('modal-programs-list'); 
+  if (progsDiv) { 
+      const counts = {}; 
+      const progsArray = Array.isArray(studentObj.programs) ? studentObj.programs : []; 
+      progsArray.forEach(p => { counts[p] = (counts[p] || 0) + 1; }); 
+      progsDiv.innerHTML = Object.keys(counts).map(p => { 
+          let pData = PROGRAMS_LIST.find(pl => pl.name === p) || { icon: 'fa-check', color: '#4f46e5' }; 
+          return `<div class="chip selected" style="padding: 6px 14px; font-size:13px; font-weight:800; border-color:${pData.color}; color:${pData.color}; background: #f8fafc; display: flex; align-items: center; gap: 8px;"><i class="fas ${pData.icon}"></i> <span>${p}</span><span style="background:${pData.color}; color:white; border-radius:10px; padding: 2px 8px; font-size:11px; min-width: 20px; text-align: center;">${counts[p]}</span></div>`; 
+      }).join(''); 
+  }
+  document.getElementById('student-modal').style.display = 'flex';
 }
 
 function openAdminLeaveModal() { document.getElementById('admin-leave-modal').style.display = 'flex'; }
@@ -1222,9 +1234,10 @@ function openMyInfo() {
   if (!dashboardData || !dashboardData.data || !dashboardData.data.teachersReport) { return alert("جاري تحميل البيانات..."); }
   const myData = dashboardData.data.teachersReport.find(t => t.name === currentUser.name); if (myData) { openTeacherProfileModal(myData); } else { alert("لم يتم العثور على إحصائيات لك."); }
 }
+
 async function updateStudentLevel() {
-    const studentId = document.getElementById('modal-student-code').innerText; // جلب كود الطالب من الكارت
-    const newLevel = document.getElementById('modal-student-level').value;
+    const studentId = document.getElementById('modal-code').getAttribute('data-id'); 
+    const newLevel = document.getElementById('modal-student-level').value.trim();
 
     if (!newLevel) return alert("يرجى إدخال المستوى أولاً");
 
@@ -1233,7 +1246,7 @@ async function updateStudentLevel() {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify({
-                action: 'updateStudentLevel', // تأكد من إضافة هذا الأكشن في Google Script
+                action: 'updateStudentLevel',
                 studentId: studentId,
                 level: newLevel
             })
@@ -1242,9 +1255,9 @@ async function updateStudentLevel() {
         const res = await response.json();
         if (res.status === 'success') {
             alert("تم تحديث المستوى بنجاح");
-            fetchDashboard(); // لتحديث البيانات في الخلفية
+            fetchDashboard(); // تحديث صامت للبيانات في الخلفية
         } else {
-            alert("خطأ في التحديث");
+            alert("خطأ في التحديث: " + res.message);
         }
     } catch (e) {
         console.error(e);
