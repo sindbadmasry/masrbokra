@@ -41,6 +41,9 @@ body { background: var(--bg); margin: 0; color: var(--text-dark); line-height: 1
 .input-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
 .input-field { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 14px; outline: none; transition: 0.3s; font-size: 15px; background: #f1f5f9; font-weight: 600; }
 .input-field:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+.form-section { background: #f8fafc; padding: 18px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 18px; transition: 0.3s; }
+.form-section:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.form-section h4 { margin-top: 0; margin-bottom: 15px; color: var(--primary); font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px; }
 
 @media print {
     header, footer, .nav-bar, .bottom-nav { display: none !important; }
@@ -97,7 +100,7 @@ header { background: var(--card-bg); color: var(--text-dark); padding: 15px 20px
 .teacher-option:hover { background: #e2e8f0; }
 .teacher-option.selected { background: #eff6ff; color: var(--primary); font-weight: 900; border: 1px solid var(--primary); }
 .multi-select { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
-.chip { padding: 10px 18px; border-radius: 20px; background: var(--bg); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 800; transition: all 0.2s ease; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; }
+.chip { padding: 10px 18px; border-radius: 20px; background: var(--card-bg); color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 800; transition: all 0.2s ease; border: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
 .chip.selected { background: #eff6ff; color: var(--primary); border-color: var(--primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15); }
 
 .sub-tabs { display: flex; background: var(--bg); border-radius: 14px; padding: 5px; margin-bottom: 20px; }
@@ -226,40 +229,52 @@ input:checked + .switch-slider:before { transform: translateX(24px); }
 
       <div class="card">
         <div class="card-title"><i class="fas fa-user-edit"></i> لوحة تسجيل الحضور</div>
-        <div class="input-group">
-          <label>تاريخ الحضور</label>
-          <input type="date" id="att-date" class="input-field">
+        
+        <div class="form-section">
+            <h4><i class="fas fa-calendar-alt"></i> إعدادات اليوم</h4>
+            <div class="input-group">
+              <label>تاريخ الحضور</label>
+              <input type="date" id="att-date" class="input-field">
+            </div>
         </div>
         
-        <div class="input-group" style="z-index: 105;">
-          <label>البحث بالاسم أو الكود (لإضافة الكود تلقائياً)</label>
-          <input type="text" id="search-student-name" class="input-field" placeholder="🔍 اكتب اسم الطالب أو كوده للبحث..." oninput="handleStudentSearch()" autocomplete="off">
-          <div id="search-student-dropdown" class="dropdown-list"></div>
+        <div class="form-section">
+            <h4><i class="fas fa-users"></i> تحديد الطلاب</h4>
+            <div class="input-group" style="z-index: 105;">
+              <label>البحث بالاسم أو الكود (لإضافة الكود تلقائياً)</label>
+              <input type="text" id="search-student-name" class="input-field" placeholder="🔍 اكتب اسم الطالب أو كوده للبحث..." oninput="handleStudentSearch()" autocomplete="off">
+              <div id="search-student-dropdown" class="dropdown-list"></div>
+            </div>
+
+            <div class="input-group">
+              <label>أكواد الطلاب (جماعي)</label>
+              <textarea id="att-student-ids" class="input-field" rows="3" placeholder="أدخل الأكواد متبوعة بمسافة..."></textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4><i class="fas fa-layer-group"></i> اختيار البرامج</h4>
+            <div class="input-group">
+              <div class="multi-select" id="prog-chips"></div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4><i class="fas fa-chalkboard-teacher"></i> طاقم العمل</h4>
+            <div class="input-group">
+              <div class="custom-dropdown" id="teacher-dropdown-container">
+                <div class="dropdown-header" onclick="toggleTeacherDropdown()">
+                  <span>اختر المدرسين...</span>
+                  <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="dropdown-list" id="teacher-list-upward" style="top: 100%;">
+                  <div style="font-size: 13px; color: var(--text-muted); text-align: center;">جاري التحميل...</div>
+                </div>
+              </div>
+            </div>
         </div>
 
-        <div class="input-group">
-          <label>أكواد الطلاب (جماعي)</label>
-          <textarea id="att-student-ids" class="input-field" rows="3" placeholder="أدخل الأكواد متبوعة بمسافة..."></textarea>
-        </div>
-        
-        <div class="input-group">
-          <label>البرامج</label>
-          <div class="multi-select" id="prog-chips"></div>
-        </div>
-        
-        <div class="input-group">
-          <label>المدرسين</label>
-          <div class="custom-dropdown" id="teacher-dropdown-container">
-            <div class="dropdown-header" onclick="toggleTeacherDropdown()">
-              <span>اختر المدرسين...</span>
-              <i class="fas fa-chevron-up"></i>
-            </div>
-            <div class="dropdown-list" id="teacher-list-upward" style="top: 100%;">
-              <div style="font-size: 13px; color: var(--text-muted); text-align: center;">جاري التحميل...</div>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-success" onclick="submitAttendance()" style="margin-top: 20px;">
+        <button class="btn btn-success" onclick="submitAttendance()" style="margin-top: 10px;">
           إرسال البيانات <i class="fas fa-paper-plane"></i>
         </button>
       </div>
@@ -601,14 +616,23 @@ const PROGRAMS_LIST = [
   { name: "معسكر", icon: "fa-campground", color: "#10b981" }, { name: "إجتماع", icon: "fa-users", color: "#64748b" }
 ];
 
+function getLocalToday() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 window.onload = () => {
   setDefaultDates();
   if (currentUser) { initApp(); }
-  const today = new Date();
-  if (document.getElementById('att-date')) document.getElementById('att-date').valueAsDate = today;
-  if (document.getElementById('manual-leave-date')) document.getElementById('manual-leave-date').valueAsDate = today;
-  if (document.getElementById('req-leave-date')) document.getElementById('req-leave-date').valueAsDate = today;
-  if (document.getElementById('perf-date')) document.getElementById('perf-date').valueAsDate = today;
+  
+  const localToday = getLocalToday();
+  if (document.getElementById('att-date')) document.getElementById('att-date').value = localToday;
+  if (document.getElementById('manual-leave-date')) document.getElementById('manual-leave-date').value = localToday;
+  if (document.getElementById('req-leave-date')) document.getElementById('req-leave-date').value = localToday;
+  if (document.getElementById('perf-date')) document.getElementById('perf-date').value = localToday;
   
   document.getElementById('prog-chips').innerHTML = PROGRAMS_LIST.map(p =>
     `<div class="chip" onclick="toggleChip(this)" data-val="${p.name}"><i class="fas ${p.icon}" style="color: ${p.color};"></i> ${p.name}</div>`
@@ -618,18 +642,15 @@ window.onload = () => {
     const isClickInsideTeacher = document.getElementById('teacher-dropdown-container')?.contains(event.target);
     if (!isClickInsideTeacher && document.getElementById('teacher-list-upward')) { document.getElementById('teacher-list-upward').classList.remove('show'); }
     
-    // إخفاء قائمة الطلاب في حال الضغط بالخارج
     const isClickInsideStudentSearch = document.getElementById('search-student-name')?.contains(event.target) || document.getElementById('search-student-dropdown')?.contains(event.target);
     if (!isClickInsideStudentSearch && document.getElementById('search-student-dropdown')) { document.getElementById('search-student-dropdown').classList.remove('show'); }
   });
 };
 
 function setFilterToToday() {
-  const now = new Date();
-  const toISODate = (d) => { const z = n => ('0' + n).slice(-2); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
-  const todayStr = toISODate(now);
-  document.getElementById('report-start-date').value = todayStr;
-  document.getElementById('report-end-date').value = todayStr;
+  const localTodayStr = getLocalToday();
+  document.getElementById('report-start-date').value = localTodayStr;
+  document.getElementById('report-end-date').value = localTodayStr;
   applyDateFilter();
 }
 
@@ -643,7 +664,6 @@ function setFilterToMonth() {
   applyDateFilter();
 }
 
-// تم جعل "اليوم" هو الفلتر الافتراضي عند فتح الصفحة
 function setDefaultDates() {
   setFilterToToday();
 }
@@ -719,15 +739,16 @@ async function fetchDashboard() {
   showLoader(false);
 }
 
-// بحث ذكي محسّن للاسم أو الكود مع قائمة منسدلة
 function handleStudentSearch() {
   const term = document.getElementById('search-student-name').value.trim().toLowerCase();
   const dropdown = document.getElementById('search-student-dropdown');
   
   if (!term) { dropdown.classList.remove('show'); return; }
-  if (!dashboardData || !dashboardData.data || !dashboardData.data.students) return;
+  if (!dashboardData || !dashboardData.data) return;
 
-  const matches = dashboardData.data.students.filter(s => 
+  const sourceList = dashboardData.data.allStudents || dashboardData.data.students || [];
+
+  const matches = sourceList.filter(s => 
       (s.name && s.name.toLowerCase().includes(term)) || 
       (s.id && s.id.toString().includes(term))
   );
@@ -848,10 +869,11 @@ async function generateAnalyticalReport() {
     reportHTML += getImageSectionHTML('kpi');
   }
 
-  // Honor Board
   const upgradedStudents = students.filter(s => s.currentLevel && s.newLevel && s.currentLevel !== s.newLevel);
   if (upgradedStudents.length > 0) {
-      reportHTML += `<h2><i class="fas fa-award"></i> لوحة الشرف (ترقيات المستويات)</h2>`;
+      reportHTML += `<div id="honor-board-section" style="position: relative;">`;
+      reportHTML += `<h2><i class="fas fa-award"></i> لوحة الشرف (ترقيات المستويات) 
+                     <button class="no-print btn-danger" onclick="document.getElementById('honor-board-section').remove()" style="margin-right: auto; padding: 5px 12px; border:none; border-radius: 8px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:5px;">حذف القسم بالكامل <i class="fas fa-trash-alt"></i></button></h2>`;
       reportHTML += `<p>نهنئ الطلاب الذين أظهروا تقدماً متميزاً وانتقلوا إلى مستويات جديدة خلال هذه الفترة:</p>`;
       reportHTML += `<div class="table-container"><table class="report-table"><thead><tr><th style="width:15%">الكود</th><th style="width:40%">اسم الطالب</th><th style="width:20%">المستوى السابق</th><th style="width:25%">المستوى الجديد</th></tr></thead><tbody>`;
       upgradedStudents.forEach(s => {
@@ -862,12 +884,12 @@ async function generateAnalyticalReport() {
               <td>
                   <span class="badge bg-approved" style="font-size:13px; font-weight:900;">${s.newLevel}</span> 
                   <i class="fas fa-arrow-up" style="color:var(--success);"></i>
-                  <button class="no-print" onclick="this.closest('tr').remove()" style="background:none; border:none; color:var(--danger); cursor:pointer; float:left; padding: 2px 8px;" title="إزالة من التقرير"><i class="fas fa-trash-alt"></i></button>
               </td>
           </tr>`;
       });
       reportHTML += `</tbody></table></div>`;
       reportHTML += getImageSectionHTML('honor-board');
+      reportHTML += `</div>`;
   }
 
   if (!hideCadres) {
@@ -1087,7 +1109,6 @@ async function submitPerformanceData() {
   const keywords = Array.from(chips).map(c => c.getAttribute('data-val'));
   const newActivity = document.getElementById('perf-new-activity').value.trim();
   const newLevel = document.getElementById('perf-new-level').value.trim();
-  // تم نقل قراءة التوصيات لترسل مع بيانات الأداء
   const notes = document.getElementById('prog-notes').value.trim();
 
   if(!date || !prog) return alert("يرجى اختيار التاريخ والبرنامج.");
@@ -1105,13 +1126,13 @@ async function submitPerformanceData() {
               keywords: keywords,
               newActivity: newActivity,
               newLevel: newLevel,
-              notes: notes // إرسال التوصيات
+              notes: notes
           }) 
       }); 
       alert("تم الحفظ بنجاح"); 
       document.getElementById('perf-new-activity').value = "";
       document.getElementById('perf-new-level').value = "";
-      document.getElementById('prog-notes').value = ""; // تفريغ حقل التوصيات بعد الحفظ
+      document.getElementById('prog-notes').value = ""; 
       closeModal('performance-modal'); 
       fetchDashboard(); 
   } catch (e) { alert("حدث خطأ."); }
@@ -1182,7 +1203,6 @@ function renderStudentsTable() {
 
   if (activeStudentFilters.has('top')) { filtered.sort((a, b) => b.days - a.days); }
   
-  // تحديث عدد الطلاب الظاهرين في البادج
   const countBadge = document.getElementById('visible-student-count');
   if (countBadge) {
       countBadge.innerText = filtered.length + ' طالب';
@@ -1254,7 +1274,6 @@ async function submitAttendance() {
   if (!ids || !date || selectedProgsBase.length === 0 || selectedTeachers.length === 0) { return alert("يرجى إكمال البيانات الأساسية (الطلاب، البرامج، والمدرسين)."); }
   showLoader(true);
   try {
-    // تم تفريغ الحقل notes من هنا لعدم تعارضه مع الأداء اليومي
     await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'submitAttendance', ids: ids, customDate: date, programs: selectedProgsBase.join(" - "), teachers: selectedTeachers.join(" - "), notes: "" }) });
     alert("تم إرسال كشف الحضور بنجاح"); document.getElementById('att-student-ids').value = ""; document.getElementById('teacher-list-upward').classList.remove('show'); fetchDashboard();
   } catch (e) { alert("حدث خطأ أثناء إرسال البيانات."); } showLoader(false);
