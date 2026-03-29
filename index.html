@@ -614,10 +614,9 @@ window.onload = () => {
   });
 };
 
-function setDefaultDates() {
-  const now = new Date(); const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const toISODate = (d) => { const z = n => ('0' + n).slice(-2); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
-  document.getElementById('report-start-date').value = toISODate(firstDay); document.getElementById('report-end-date').value = toISODate(lastDay);
+function setDefaultDates(){
+  const d=new Date(),f=n=>('0'+n).slice(-2),t=x=>x.getFullYear()+'-'+f(x.getMonth()+1)+'-'+f(x.getDate());
+  report-start-date.value=report-end-date.value=t(d)
 }
 
 function showLoader(show) { document.getElementById('global-loader').style.display = show ? 'flex' : 'none'; }
